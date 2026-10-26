@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Exam Stack</title>
+<style>
+/* One reading column; the stack is a list with large ordinals, the active task opens in place. Light only, system sans. */
+:root{
+  --bg:#ffffff; --surface:#ffffff; --ink:#16171a; --soft:#5a5d66; --faint:#9a9ca3; --line:#e5e6e9; --wash:#f5f6f8;
+  --accent:#1f4bd8; --good:#1d7a4f; --mid:#9a6200; --hard:#b4322b;
+  --f-body:"Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:780px;margin:0 auto;padding-block:56px 96px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:40px}
+@media (max-width:560px){.wrap{padding-block:32px 72px;gap:32px}}
+
+header{display:flex;flex-direction:column;gap:14px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+h1{font-weight:700;font-size:clamp(34px,7vw,52px);line-height:1.08;letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent)}
+h2{font-weight:700;font-size:24px;line-height:1.2;margin:0}
+p{margin:0;max-width:62ch}
+.lede{font-size:17px;color:var(--soft);line-height:1.65}
+.small{font-size:13.5px;color:var(--soft)}
+
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
+.stat{display:flex;flex-direction:column;gap:2px;padding:16px 16px 14px 0}
+.stat+.stat{padding-left:16px;border-left:1px solid var(--line)}
+@media (max-width:560px){.summary{grid-template-columns:minmax(0,1fr)}.stat+.stat{padding-left:0;border-left:0;border-top:1px solid var(--line)}}
+.stat .v{font-weight:600;font-size:26px;line-height:1.15;font-variant-numeric:tabular-nums}
+.stat .k{font-size:13px;color:var(--soft)}
+.bar{height:3px;background:var(--line);margin-top:8px}
+.bar>i{display:block;height:100%;width:0;background:var(--accent);transition:width .35s}
+.save{font-size:13px;color:var(--faint);margin-top:-28px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--soft);align-items:center}
+
+.stack{display:flex;flex-direction:column}
+.card{border-bottom:1px solid var(--line)}
+.stack>.card:first-child{border-top:1px solid var(--line)}
+.head{width:100%;display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding:18px 0;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.head:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
+.rank{font-weight:600;font-size:30px;line-height:1;color:var(--faint);font-variant-numeric:tabular-nums}
+.card.next .rank{color:var(--accent)}
+.card.done .rank{color:var(--good);font-size:24px}
+.card:hover .rank{color:var(--ink)}
+.ttl{display:flex;flex-direction:column;gap:8px;min-width:0}
+.ttl b{font-weight:600;font-size:18px;line-height:1.3}
+.card.done .ttl b{color:var(--soft)}
+.chips{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:var(--soft)}
+.chip{white-space:nowrap}
+.chips>.chip+.chip::before{content:"·";margin-right:10px;color:var(--faint)}
+.chip.freq{color:var(--accent)}
+.chip.easy{color:var(--good)}
+.chip.med{color:var(--mid)}
+.chip.hard{color:var(--hard)}
+.chip.got{color:var(--good)}
+.chev{font-size:13px;font-weight:600;color:var(--faint)}
+.card.next .chev{color:var(--accent)}
+
+.body{padding:0 0 28px 80px;display:flex;flex-direction:column;gap:22px}
+@media (max-width:560px){.body{padding-left:0}.head{grid-template-columns:48px minmax(0,1fr) auto;gap:12px}}
+.why{font-size:15.5px;line-height:1.55;color:var(--soft);max-width:62ch}
+.recipe{display:flex;flex-direction:column;gap:8px;background:var(--wash);border-radius:12px;padding:16px 18px}
+.recipe h3,.ex h3{font-weight:600;font-size:13px;letter-spacing:.02em;margin:0;color:var(--soft)}
+.recipe ol{margin:0;padding:0;list-style:none;counter-reset:step;display:flex;flex-direction:column;gap:8px;font-size:15.5px}
+.recipe li{counter-increment:step;position:relative;padding-left:30px}
+.recipe li::before{content:counter(step) ".";position:absolute;left:0;top:0;font-weight:700;color:var(--accent)}
+.exs{display:flex;flex-direction:column;gap:14px}
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+@media (max-width:560px){.ex{padding:14px}}
+.ex h3{color:var(--accent)}
+.ex .q{font-size:15.5px;overflow-x:auto}
+.ex .q p+p,.ex .a p+p{margin-top:8px}
+details.sol{border-top:1px solid var(--line);padding-top:12px}
+details.sol summary{cursor:pointer;font-weight:500;font-size:14px;list-style:none;display:inline-flex;gap:8px;align-items:center}
+details.sol summary::-webkit-details-marker{display:none}
+details.sol summary::before{content:"+";color:var(--accent);width:12px}
+details.sol[open] summary::before{content:"\2212"}
+details.sol summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+details.sol .a{margin-top:12px;font-size:15px;overflow-x:auto}
+.ex table{border-collapse:collapse;font-size:14px;margin:8px 0;font-variant-numeric:tabular-nums}
+.ex th,.ex td{border-bottom:1px solid var(--line);padding:5px 12px 5px 0;text-align:left}
+.ex th{font-weight:500;color:var(--soft)}
+.exbtns,.cardbtns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:500 14px var(--f-body);padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s}
+.btn:hover{border-color:var(--ink)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.on{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn.primary:hover{filter:brightness(1.08)}
+.cut{display:flex;align-items:center;gap:14px;padding:22px 0 10px;font-weight:600;font-size:14px;color:var(--accent)}
+.cut::after{content:"";flex:1;border-top:1px solid var(--accent)}
+.pile{display:flex;flex-direction:column;gap:14px}
+.empty{padding:18px 0;color:var(--faint);font-size:14.5px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1>The <em>exam</em> stack</h1>
+    <p class="lede" id="lede"></p>
+  </header>
+
+  <section class="summary" aria-label="Progress">
+    <div class="stat"><span class="v" id="sDone">0 / 0</span><span class="k">Tasks done</span><div class="bar"><i id="sBar"></i></div></div>
+    <div class="stat"><span class="v" id="sTime">–</span><span class="k">Left in the stack</span></div>
+    <div class="stat"><span class="v" id="sExam">–</span><span class="k">Until the exam</span></div>
+  </section>
+  <p class="save" id="saveNote">Progress is saved in this browser.</p>
+
+  <div class="legend" aria-hidden="true">
+    <span><span class="chip freq">6/6</span> · papers it was on</span>
+    <span>pts · typical points</span>
+    <span><span class="chip easy">easy</span> · <span class="chip med">medium</span> · <span class="chip hard">hard</span></span>
+  </div>
+
+  <section class="stack" id="stack" aria-label="Task stack"></section>
+
+  <section class="pile" aria-labelledby="pileH">
+    <h2 id="pileH">Done</h2>
+    <div class="stack" id="pile"></div>
+  </section>
+</div>
+
+<!-- build.mjs replaces the placeholder below with the contents of stack.json -->
+<script type="application/json" id="stack-data">/*__STACK__*/</script>
+<script>
+window.MathJax = { tex: { inlineMath: [["\\(","\\)"]], displayMath: [["\\[","\\]"]] }, svg: { fontCache: "global" }, startup: { typeset: false } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg-full.js"></script>
+<script>
+(function(){
+  let S = {};
+  try { S = JSON.parse(document.getElementById("stack-data").textContent); } catch(e) { S = {}; }
+  const C = S.course || {};
+  const TASKS = S.tasks || [];
+  const DATA = S.exercises || {};
+  const BUDGET = C.studyMinutes || 0;
+  const EASE = {easy:"easy", med:"medium", hard:"hard"};
+
+  document.title = (C.code ? C.code + " " : "") + "Exam Stack";
+  document.getElementById("eyebrow").textContent = [C.code && C.name ? C.code + " " + C.name : (C.name || C.code), C.examLabel].filter(Boolean).join(" · ");
+  document.getElementById("lede").textContent = TASKS.length + " tasks that keep coming back, in the order that earns the most points per hour. Each has a recipe and real questions from past papers with solutions. Do one, grade yourself, mark it done, move on.";
+
+  // ---- state: {status:{T1:"done"}, ex:{"T1-0":"got"|"again"}} ----
+  let state = {status:{}, ex:{}};
+  let ref = null, saving = false, pending = false;
+  const LS = "exam-stack:" + (C.code || C.name || "course");
+  try { const s = JSON.parse(localStorage.getItem(LS) || "null"); if (s && s.status) state = s; } catch(e) {}
+
+  function persist(){
+    try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e) {}
+    if (!ref) return;
+    if (saving) { pending = true; return; }
+    saving = true;
+    ref.set({status: state.status, ex: state.ex, updated: Date.now()})
+      .catch(() => { setNote("Couldn't sync to your account right now; progress is kept in this browser."); })
+      .finally(() => { saving = false; if (pending) { pending = false; persist(); } });
+  }
+  function setNote(t){ const n = document.getElementById("saveNote"); if (n) n.textContent = t; }
+
+  // ---- render ----
+  const open = new Set();
+  const openSol = new Set();
+  // Compare states by content so a sync echo doesn't re-render (and close open solutions).
+  function stable(o){ const s = k => Object.keys(o[k] || {}).sort().map(x => x + "=" + o[k][x]).join(","); return s("status") + "|" + s("ex"); }
+  function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function nextId(){ const t = TASKS.find(t => state.status[t.id] !== "done"); return t ? t.id : null; }
+
+  function card(t, rank, isNext){
+    const done = state.status[t.id] === "done";
+    const c = el("article", "card" + (isNext ? " next" : "") + (done ? " done" : ""));
+    c.id = "card-" + t.id;
+    const h = el("button", "head"); h.type = "button";
+    h.setAttribute("aria-expanded", open.has(t.id) ? "true" : "false");
+    h.appendChild(el("span", "rank", String(rank)));
+    const ttl = el("span", "ttl");
+    ttl.appendChild(el("b", null, t.title));
+    const chips = el("span", "chips");
+    if (t.freq) chips.appendChild(el("span", "chip freq", t.freq));
+    if (t.pts) chips.appendChild(el("span", "chip", t.pts + " pts"));
+    if (t.ease) chips.appendChild(el("span", "chip " + t.ease, EASE[t.ease] || t.ease));
+    if (t.min) chips.appendChild(el("span", "chip", "~" + t.min + " min"));
+    const exs = DATA[t.id] || [];
+    const got = exs.filter((_, i) => state.ex[t.id + "-" + i] === "got").length;
+    if (got) chips.appendChild(el("span", "chip got", got + "/" + exs.length + " solved"));
+    ttl.appendChild(chips);
+    h.appendChild(ttl);
+    h.appendChild(el("span", "chev", open.has(t.id) ? "close" : (isNext ? "start" : "open")));
+    h.addEventListener("click", () => { open.has(t.id) ? open.delete(t.id) : open.add(t.id); render(); });
+    c.appendChild(h);
+
+    if (open.has(t.id)) {
+      const b = el("div", "body");
+      if (t.why) { const w = el("p", "why"); w.innerHTML = t.why; b.appendChild(w); }
+      if (t.recipe && t.recipe.length) {
+        const r = el("div", "recipe");
+        r.appendChild(el("h3", null, "Recipe" + (t.ref ? " · cheat sheet " + t.ref : "")));
+        const ol = el("ol");
+        t.recipe.forEach(step => { const li = el("li"); li.innerHTML = step; ol.appendChild(li); });
+        r.appendChild(ol);
+        b.appendChild(r);
+      }
+
+      const list = el("div", "exs");
+      if (!exs.length) list.appendChild(el("p", "small", "No past-exam question loaded for this task."));
+      exs.forEach((x, i) => {
+        const k = t.id + "-" + i;
+        const box = el("div", "ex");
+        box.appendChild(el("h3", null, [x.paper, x.q != null ? "Q" + x.q : null, x.pts != null ? x.pts + " pts" : null].filter(Boolean).join(" · ")));
+        const q = el("div", "q"); q.innerHTML = x.question; box.appendChild(q);
+        const d = el("details", "sol");
+        d.appendChild(el("summary", null, "Show solution"));
+        const a = el("div", "a"); a.innerHTML = x.solution; d.appendChild(a);
+        if (openSol.has(k)) { d.open = true; setTimeout(() => typeset(a), 0); }
+        d.addEventListener("toggle", () => { if (d.open) { openSol.add(k); typeset(a); } else openSol.delete(k); });
+        box.appendChild(d);
+        const btns = el("div", "exbtns");
+        const g = el("button", "btn" + (state.ex[k] === "got" ? " on" : ""), "I got it right"); g.type = "button";
+        const n = el("button", "btn" + (state.ex[k] === "again" ? " on" : ""), "Not yet"); n.type = "button";
+        g.addEventListener("click", () => { state.ex[k] = "got"; persist(); render(); });
+        n.addEventListener("click", () => { state.ex[k] = "again"; persist(); render(); });
+        btns.append(g, n);
+        box.appendChild(btns);
+        list.appendChild(box);
+      });
+      b.appendChild(list);
+
+      // Done cards move to the pile and can always be put back; nothing is ever deleted.
+      const cb = el("div", "cardbtns");
+      if (!done) {
+        const m = el("button", "btn primary", "Mark done → move to the pile"); m.type = "button";
+        m.addEventListener("click", () => { state.status[t.id] = "done"; open.delete(t.id); const nx = nextId(); if (nx) open.add(nx); persist(); render(); scrollToNext(); });
+        cb.appendChild(m);
+      } else {
+        const u = el("button", "btn", "Put back on the stack"); u.type = "button";
+        u.addEventListener("click", () => { delete state.status[t.id]; persist(); render(); });
+        cb.appendChild(u);
+      }
+      b.appendChild(cb);
+      c.appendChild(b);
+      setTimeout(() => { typeset(b.querySelector(".why")); typeset(b.querySelector(".recipe")); }, 0);
+      b.querySelectorAll(".ex .q").forEach(q => setTimeout(() => typeset(q), 0));
+    }
+    return c;
+  }
+
+  function fmtMin(mins){ const h = Math.floor(mins / 60), m = mins % 60; return ((h ? h + " h " : "") + (m ? m + " min" : "")).trim(); }
+
+  function render(){
+    const stack = document.getElementById("stack"), pile = document.getElementById("pile");
+    stack.textContent = ""; pile.textContent = "";
+    const nx = nextId();
+    let mins = 0, cutDone = false, rank = 0;
+    TASKS.forEach(t => {
+      if (state.status[t.id] === "done") return;
+      rank++;
+      if (BUDGET && !cutDone && mins + (t.min || 0) > BUDGET && mins > 0) {
+        stack.appendChild(el("div", "cut", "about " + fmtMin(BUDGET) + " of work above this line"));
+        cutDone = true;
+      }
+      mins += t.min || 0;
+      stack.appendChild(card(t, rank, t.id === nx));
+    });
+    if (!rank) stack.appendChild(el("div", "empty", "Stack cleared. Sit a full past paper under time pressure, or reopen a task below."));
+    const doneTasks = TASKS.filter(t => state.status[t.id] === "done");
+    if (!doneTasks.length) pile.appendChild(el("div", "empty", "Tasks you mark done land here. Open one any time to redo a question."));
+    doneTasks.forEach(t => pile.appendChild(card(t, "✓", false)));
+
+    document.getElementById("sDone").textContent = doneTasks.length + " / " + TASKS.length;
+    document.getElementById("sBar").style.width = (TASKS.length ? 100 * doneTasks.length / TASKS.length : 0) + "%";
+    document.getElementById("sTime").textContent = mins ? "≈ " + fmtMin(mins) : "done";
+  }
+
+  function scrollToNext(){
+    const nx = nextId(); if (!nx) return;
+    const c = document.getElementById("card-" + nx);
+    if (c) c.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start"});
+  }
+
+  function typeset(node){
+    // render() rebuilds the DOM, so a deferred typeset may hit a node that is already gone; MathJax can't measure those.
+    if (!node || !node.isConnected || !window.MathJax || !MathJax.typesetPromise) return;
+    MathJax.typesetPromise([node]).catch(() => {});
+  }
+
+  function examClock(){
+    const t = document.getElementById("sExam");
+    const exam = C.examStart ? new Date(C.examStart).getTime() : NaN;
+    if (isNaN(exam)) { t.textContent = "–"; return; }
+    const d = exam - Date.now();
+    if (d <= 0) { t.textContent = "started"; return; }
+    const hrs = Math.floor(d / 3600000), mins = Math.floor((d % 3600000) / 60000);
+    t.textContent = hrs >= 48 ? Math.floor(hrs / 24) + " days" : hrs + " h " + mins + " min";
+  }
+
+  const first = nextId(); if (first) open.add(first);
+  render(); examClock(); setInterval(examClock, 60000);
+  if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(() => document.querySelectorAll(".why,.recipe,.ex .q").forEach(typeset));
+
+  // ---- optional: sync across devices when hosted as a claude.ai Artifact with the db + user capabilities ----
+  (async () => {
+    if (!window.claude || !claude.use) return;
+    const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    if (!db || !user) return;
+    const uid = await user.id();
+    if (!uid) return;
+    try { ref = db.doc("data/users/" + uid + "/stack"); } catch(e) { ref = null; return; }
+    setNote("Progress syncs to your account, so it follows you between devices.");
+    let firstSnap = true;
+    ref.onSnapshot(snap => {
+      if (snap.exists) {
+        const d = snap.data() || {};
+        const remote = {status: Object.assign({}, d.status || {}), ex: Object.assign({}, d.ex || {})};
+        if (firstSnap) {
+          // merge anything done in this browser before sync started
+          const merged = {status: Object.assign({}, remote.status, state.status), ex: Object.assign({}, remote.ex, state.ex)};
+          const changed = stable(merged) !== stable(remote);
+          state = merged;
+          if (changed) persist();
+          render();
+        } else if (stable(remote) !== stable(state)) {
+          state = remote;
+          try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e) {}
+          render();
+        }
+      } else if (firstSnap && (Object.keys(state.status).length || Object.keys(state.ex).length)) {
+        persist();
+      }
+      firstSnap = false;
+    }, () => { ref = null; setNote("Progress is saved in this browser."); });
+  })();
+})();
+</script>
+</body>
+</html>

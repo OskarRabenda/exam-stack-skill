@@ -1,0 +1,85 @@
+{
+  "course": {
+    "code": "DEMO",
+    "name": "Linear Algebra (format example: invented questions)",
+    "examLabel": "Fri 12 Jun · 13:30",
+    "examStart": "2027-06-12T13:30:00+02:00",
+    "studyMinutes": 45
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Determinant of a 3×3 matrix",
+      "freq": "5/5",
+      "pts": "3–4",
+      "ease": "easy",
+      "min": 15,
+      "why": "On every paper and pure routine, so it's cheap points.",
+      "ref": "S1",
+      "recipe": [
+        "Pick the row or column with the most zeros.",
+        "Expand: \\(\\det A=\\sum_j (-1)^{i+j}a_{ij}M_{ij}\\), where \\(M_{ij}\\) deletes row \\(i\\) and column \\(j\\).",
+        "Check the sign pattern \\(+,-,+\\) before adding."
+      ]
+    },
+    {
+      "id": "T2",
+      "title": "Inverse of a 2×2 matrix",
+      "freq": "4/5",
+      "pts": "2–3",
+      "ease": "easy",
+      "min": 10,
+      "why": "One formula. The only trap is forgetting to check that \\(\\det\\ne0\\).",
+      "ref": "S2",
+      "recipe": [
+        "Compute \\(\\det=ad-bc\\). If it is 0, there is no inverse.",
+        "Swap \\(a,d\\), negate \\(b,c\\), divide by \\(\\det\\).",
+        "Verify \\(AA^{-1}=I\\)."
+      ]
+    },
+    {
+      "id": "T3",
+      "title": "Eigenvalues and definiteness of a symmetric 2×2 matrix",
+      "freq": "3/5",
+      "pts": "4–6",
+      "ease": "med",
+      "min": 25,
+      "why": "Worth more than the first two, but needs the characteristic polynomial done carefully.",
+      "ref": "S3",
+      "recipe": [
+        "Characteristic polynomial: \\(\\lambda^2-\\operatorname{tr}(A)\\lambda+\\det A=0\\).",
+        "Solve for \\(\\lambda\\).",
+        "All \\(\\lambda>0\\): positive definite. Any \\(\\lambda<0\\) together with one \\(>0\\): indefinite."
+      ]
+    }
+  ],
+  "exercises": {
+    "T1": [
+      {
+        "paper": "Example paper A",
+        "q": "2a",
+        "pts": 4,
+        "question": "<p>Compute \\(\\det\\begin{pmatrix}1&2&0\\\\0&1&3\\\\2&0&1\\end{pmatrix}\\).</p>",
+        "solution": "<ol><li>Expand along row 1 (it has a zero): \\(1\\cdot\\det\\begin{pmatrix}1&3\\\\0&1\\end{pmatrix}-2\\cdot\\det\\begin{pmatrix}0&3\\\\2&1\\end{pmatrix}+0\\).</li><li>\\(=1\\cdot1-2\\cdot(0-6)=1+12=\\mathbf{13}\\).</li></ol><p><em>Rubric (4, inferred):</em> 2 for the expansion with signs, 2 for the value.</p>"
+      }
+    ],
+    "T2": [
+      {
+        "paper": "Example paper B",
+        "q": "1",
+        "pts": 3,
+        "question": "<p>Find \\(A^{-1}\\) for \\(A=\\begin{pmatrix}2&1\\\\5&3\\end{pmatrix}\\).</p>",
+        "solution": "<ol><li>\\(\\det A=2\\cdot3-1\\cdot5=1\\ne0\\).</li><li>\\(A^{-1}=\\begin{pmatrix}3&-1\\\\-5&2\\end{pmatrix}\\).</li><li>Check: \\(\\begin{pmatrix}2&1\\\\5&3\\end{pmatrix}\\begin{pmatrix}3&-1\\\\-5&2\\end{pmatrix}=\\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}\\) ✓</li></ol>"
+      }
+    ],
+    "T3": [
+      {
+        "paper": "Example paper A",
+        "q": "4",
+        "pts": 6,
+        "question": "<p>Let \\(A=\\begin{pmatrix}2&1\\\\1&2\\end{pmatrix}\\). Find the eigenvalues and decide whether \\(A\\) is positive definite.</p>",
+        "solution": "<ol><li>\\(\\operatorname{tr}A=4\\), \\(\\det A=3\\), so \\(\\lambda^2-4\\lambda+3=0\\).</li><li>\\(\\lambda=1\\) or \\(\\lambda=3\\).</li><li>Both are \\(>0\\), and none is \\(<0\\), so \\(A\\) is <strong>positive definite</strong>.</li></ol><p><em>Rubric (6, inferred):</em> 2 polynomial, 2 eigenvalues, 2 conclusion with reason.</p>"
+      }
+    ]
+  }
+}
