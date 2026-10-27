@@ -16,7 +16,6 @@
   --good:#2E6B3F; --warn:#8A5A12;
   --serif:"Crimson Pro","Crimson Text",Georgia,"Times New Roman",serif;
   --sans:"Source Sans 3","Source Sans Pro","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
-  --side:300px; --gap:56px;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
@@ -62,29 +61,28 @@ p{margin:0}
 .is-dark .themebtn .moon{display:none}
 @media (max-width:640px){.tools .prog{display:none}.tocpanel{position:fixed;left:12px;right:12px;top:56px;width:auto;max-height:calc(100vh - 72px)}}
 
-/* ---------- page grid ---------- */
-.page{max-width:1180px;margin:0 auto;padding:44px max(16px,4vw) 120px}
-.split{display:grid;grid-template-columns:minmax(0,1fr) var(--side);column-gap:var(--gap)}
-.side{font-family:var(--sans);font-size:15px;line-height:1.5;color:var(--soft);display:flex;flex-direction:column;gap:20px;min-width:0}
-.side ul,.side ol{margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
-@media (max-width:1000px){.split{grid-template-columns:minmax(0,1fr)}.side{margin-top:22px}}
-
-header.split{align-items:start;margin-bottom:34px}
-header .side{padding-left:18px;border-left:1px solid var(--line)}
-@media (max-width:1000px){header .side{padding:14px 16px;border-left:2px solid var(--accent);background:var(--tint)}}
+/* ---------- one reading column: everything comes in order, top to bottom ---------- */
+.page{max-width:760px;margin:0 auto;padding:44px max(16px,4vw) 120px}
 h1{font-weight:400;font-style:italic;font-size:clamp(44px,6vw,64px);line-height:1.02;margin:0;letter-spacing:-.01em}
-.lede{font-size:21px;color:var(--soft);max-width:640px;margin-top:14px}
-.profile dl{margin:6px 0 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px}
-.profile dt{font-weight:600;color:var(--ink)}
-.profile dd{margin:0}
-.profile dd ul{margin:0;padding-left:16px}
-
+.lede{font-size:21px;color:var(--soft);margin-top:14px}
 .stats{display:flex;flex-wrap:wrap;gap:12px 36px;margin-top:30px}
-.rule{border-top:2px solid var(--line-strong);margin-top:8px}
 .stat{display:flex;flex-direction:column}
 .stat .v{font-size:28px;line-height:1.15;font-variant-numeric:lining-nums tabular-nums}
 .stat .k{font-family:var(--sans);font-size:14px;color:var(--faint)}
 .save{margin-top:10px}
+
+/* "How this exam is graded" stays folded until opened, so the first screen stays quiet */
+.profile{margin-top:26px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.profile>summary{cursor:pointer;list-style:none;padding:12px 0;font-family:var(--sans);font-weight:600;font-size:15px;color:var(--accent)}
+.profile>summary::-webkit-details-marker{display:none}
+.profile>summary::before{content:"+ "}
+.profile[open]>summary::before{content:"\2212  "}
+.profile dl{margin:0 0 16px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;font-size:18px}
+.profile dt{font-family:var(--sans);font-weight:600;font-size:14.5px;color:var(--soft);padding-top:3px}
+.profile dd{margin:0}
+.profile dd ul{margin:0;padding-left:18px}
+@media (max-width:560px){.profile dl{grid-template-columns:minmax(0,1fr)}.profile dd{margin-bottom:6px}}
+.rule{border-top:2px solid var(--line-strong);margin-top:30px}
 
 /* ---------- cards ---------- */
 .stack{display:flex;flex-direction:column}
@@ -104,16 +102,16 @@ h1{font-weight:400;font-style:italic;font-size:clamp(44px,6vw,64px);line-height:
 .chev{font-family:var(--sans);font-size:14px;color:var(--faint)}
 .card.next .chev{color:var(--accent);font-weight:600}
 
-.body{padding:0 0 40px}
-.body.split{grid-template-areas:"lead side" "main side" "act side"}
-.lead{grid-area:lead;display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
-.body .side{grid-area:side;align-self:start;position:sticky;top:76px;max-height:calc(100vh - 96px);overflow-y:auto;scrollbar-width:thin;padding-left:18px;border-left:1px solid var(--line)}
-.problems{grid-area:main;display:flex;flex-direction:column;gap:30px;min-width:0}
-.act{grid-area:act;margin-top:22px}
-@media (max-width:1000px){
-  .body.split{grid-template-areas:"lead" "side" "main" "act"}
-  .body .side{position:static;max-height:none;overflow:visible;padding:14px 16px;border-left:2px solid var(--accent);background:var(--tint);margin:0 0 22px}
-}
+.body{padding:0 0 40px;display:flex;flex-direction:column;gap:22px}
+.lead{display:flex;flex-direction:column;gap:10px}
+.problems{display:flex;flex-direction:column;gap:30px;min-width:0}
+.act{margin-top:4px}
+.recipe ol,.graders ul{margin:8px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:5px}
+.recipe{background:var(--tint);border-left:2px solid var(--accent);padding:12px 16px}
+.recipe-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.recipe.hidden{background:transparent;padding:4px 16px}
+.recipe.hidden ol{display:none}
+.graders{padding-left:16px;border-left:2px solid var(--line)}
 .why{color:var(--soft)}
 .note{font-family:var(--sans);font-size:15px;color:var(--warn)}
 
@@ -191,22 +189,20 @@ dialog .row{flex-direction:column;align-items:stretch}
 </div>
 
 <div class="page" id="top">
-  <header class="split">
-    <div>
-      <h1>The exam stack</h1>
-      <p class="lede" id="lede"></p>
-      <section class="stats" aria-label="Progress">
-        <div class="stat"><span class="v" id="sDone">0 / 0</span><span class="k">tasks done</span></div>
-        <div class="stat"><span class="v" id="sRound">1</span><span class="k">round</span></div>
-        <div class="stat"><span class="v" id="sTime">–</span><span class="k">left, roughly</span></div>
-        <div class="stat"><span class="v" id="sExam">–</span><span class="k">until the exam</span></div>
-      </section>
-      <p class="save muted" id="saveNote">Progress is saved in this browser.</p>
-    </div>
-    <aside class="side profile" id="profile" aria-labelledby="profH" hidden>
-      <span class="note-label" id="profH">How this exam is graded</span>
+  <header>
+    <h1>The exam stack</h1>
+    <p class="lede" id="lede"></p>
+    <section class="stats" aria-label="Progress">
+      <div class="stat"><span class="v" id="sDone">0 / 0</span><span class="k">tasks done</span></div>
+      <div class="stat"><span class="v" id="sRound">1</span><span class="k">round</span></div>
+      <div class="stat"><span class="v" id="sTime">–</span><span class="k">left, roughly</span></div>
+      <div class="stat"><span class="v" id="sExam">–</span><span class="k">until the exam</span></div>
+    </section>
+    <p class="save muted" id="saveNote">Progress is saved in this browser.</p>
+    <details class="profile" id="profile" hidden>
+      <summary>How this exam is graded</summary>
       <dl id="profDl"></dl>
-    </aside>
+    </details>
   </header>
   <div class="rule" aria-hidden="true"></div>
 
@@ -323,6 +319,9 @@ window.MathJax = { tex: { inlineMath: [["\\(","\\)"]], displayMath: [["\\[","\\]
 
   // ---------- render ----------
   const open = new Set(), openAns = new Set();
+  const RECIPES = "exam-stack-recipes";
+  let recipesHidden = false;
+  try { recipesHidden = localStorage.getItem(RECIPES) === "hidden"; } catch(e) {}
   function card(t, label, isNext){
     const done = state.status[t.id] === "done";
     const c = el("article", "card" + (isNext ? " next" : "") + (done ? " done" : ""));
@@ -346,8 +345,8 @@ window.MathJax = { tex: { inlineMath: [["\\(","\\)"]], displayMath: [["\\[","\\]
     c.appendChild(h);
     if (!open.has(t.id)) return c;
 
-    // main column: why + questions; margin: what graders reward + recipe (stays in view while scrolling)
-    const b = el("div", "body split");
+    // one column, in reading order: why → recipe → what graders reward → questions
+    const b = el("div", "body");
     const lead = el("div", "lead");
     if (t.why) lead.appendChild(html("p", "why", t.why));
     const missing = (t.after || []).filter(id => byId[id] && state.status[id] !== "done");
@@ -359,20 +358,25 @@ window.MathJax = { tex: { inlineMath: [["\\(","\\)"]], displayMath: [["\\[","\\]
       lead.appendChild(n);
     }
     if (lead.children.length) b.appendChild(lead);
-    const side = el("aside", "side");
+    if (t.recipe && t.recipe.length) {
+      // Hiding the recipe is one setting for every card, so a closed-book run can be practised without it.
+      const r = el("div", "recipe" + (recipesHidden ? " hidden" : ""));
+      const rh = el("div", "recipe-head");
+      rh.appendChild(el("span", "note-label", "Recipe" + (t.ref ? " · cheat sheet " + t.ref : "")));
+      const tg = el("button", "linkbtn", recipesHidden ? "Show recipe" : "Hide recipe"); tg.type = "button";
+      tg.setAttribute("aria-expanded", recipesHidden ? "false" : "true");
+      tg.addEventListener("click", () => { recipesHidden = !recipesHidden; try { localStorage.setItem(RECIPES, recipesHidden ? "hidden" : "shown"); } catch(e) {} render(); });
+      rh.appendChild(tg);
+      r.appendChild(rh);
+      const ol = el("ol"); t.recipe.forEach(s => ol.appendChild(html("li", null, s))); r.appendChild(ol);
+      b.appendChild(r);
+    }
     if (t.graders && t.graders.length) {
       const g = el("div", "graders");
       g.appendChild(el("span", "note-label", "What graders reward"));
       const ul = el("ul"); t.graders.forEach(x => ul.appendChild(html("li", null, x))); g.appendChild(ul);
-      side.appendChild(g);
+      b.appendChild(g);
     }
-    if (t.recipe && t.recipe.length) {
-      const r = el("div", "recipe");
-      r.appendChild(el("span", "note-label", "Recipe" + (t.ref ? " · cheat sheet " + t.ref : "")));
-      const ol = el("ol"); t.recipe.forEach(s => ol.appendChild(html("li", null, s))); r.appendChild(ol);
-      side.appendChild(r);
-    }
-    if (side.children.length) b.appendChild(side);
 
     const list = el("div", "problems");
     const exs = EX[t.id] || [];
