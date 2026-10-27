@@ -9,7 +9,7 @@ It counts which question types come back across the papers, ranks them by points
 - a **rubric checklist** per answer: tick what you actually wrote and see your score, with each rubric marked official or inferred, and each answer marked official, recomputed or reasoned
 - a **done pile** (nothing is ever deleted) and **Restart the stack** for a second round, either every card or only the ones you scored under 70%, with past rounds kept in a history
 
-The look is a single reading column, like a well-typeset course reader in Crimson Pro. Each card reads top to bottom: why it matters, the recipe (with a **Hide recipe** switch for closed-book practice), what graders reward, then the questions. "How this exam is graded" stays folded until you open it, and a sun/moon button switches light and dark mode.
+The look is a single reading column, like a well-typeset course reader in Crimson Pro. Each card reads top to bottom: why it matters, what graders reward, then the questions. The one exception is the recipe: it sits beside the questions and stays on screen while you scroll (on a phone, a floating **Recipe** button brings it up), and a **Hide recipe** switch removes it for closed-book practice. "How this exam is graded" stays folded until you open it, and a sun/moon button switches light and dark mode.
 
 ## Install
 
