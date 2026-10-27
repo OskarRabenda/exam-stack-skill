@@ -23,9 +23,12 @@ My course: [course name]
 Exam date and time: [date, time]
 Study time I have: [about N hours]
 My past exams are attached.
+If you can't open that link, don't guess: tell me, and I'll attach the file instead.
 ```
 
 Answer its questions, then open the page it gives you.
+
+**If your AI says it can't open the link:** open [exam-stack-all-in-one.md](https://raw.githubusercontent.com/OskarRabenda/exam-stack-skill/main/exam-stack-all-in-one.md) in your browser, press **Ctrl+S** (Mac: **Cmd+S**) to save it, attach the saved file to the same chat, and write: *"Here is the file. Follow it."* That one file holds the instructions and the page template.
 
 ## Install (Claude Code and other coding agents)
 
@@ -53,6 +56,7 @@ skills/exam-stack/
 │   └── stack-json.md                # the data format of the page
 ├── scripts/
 │   ├── tally.mjs                    # tally.csv → frequency ranking (deterministic counting)
+│   ├── bundle.mjs                   # rebuilds exam-stack-all-in-one.md for chats that can't open links
 │   └── build.mjs                    # validates stack.json, inlines images, builds the page (Node 18+)
 └── assets/
     ├── template.html                # the study page

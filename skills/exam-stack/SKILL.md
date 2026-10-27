@@ -15,7 +15,10 @@ description: Turn a large pool of past written exams into a prioritized, interac
 > Exam date and time: [date, time]
 > Study time I have: [about N hours]
 > My past exams are attached.
+> If you can't open that link, don't guess: tell me, and I'll attach the file instead.
 > ```
+>
+> **If your AI says it can't open the link:** open <https://raw.githubusercontent.com/OskarRabenda/exam-stack-skill/main/exam-stack-all-in-one.md> in your browser, press **Ctrl+S** (Mac: **Cmd+S**) to save it, attach the saved file to the same chat, and write: *"Here is the file. Follow it."*
 
 An exam stack is one HTML page that answers a student's question: *with the time I have left, what should I practise, in what order, with which real exam questions, and how will it be graded?*
 
@@ -37,7 +40,7 @@ The value is in two things a student can't easily do alone: **an honest ranking*
 
 ## Running from a link (Claude or ChatGPT in the browser, nothing installed)
 
-If you were pointed at this file by URL instead of having the skill installed, everything still works:
+If you were pointed at this file by URL, or were given `exam-stack-all-in-one.md` as an attachment, instead of having the skill installed, everything still works. (In the all-in-one file, every reference and the template are sections further down the same file, so use those instead of links.)
 - **The other files** live next to this one. Open them by adding the path to `https://raw.githubusercontent.com/OskarRabenda/exam-stack-skill/main/skills/exam-stack/`, e.g. `…/references/stack-json.md` or `…/assets/template.html`. Read a reference when a phase tells you to.
 - **Inputs** are the files attached to the chat instead of a folder. **Outputs** are files you hand back (a download, or an Artifact / canvas) instead of files saved to a folder.
 - **Counting (phase 3):** run `scripts/tally.mjs` if you can run Node with internet access. Otherwise do the same count in Python or by hand: papers on, typical points, share of all points with every paper normalized to 100, year last seen.
