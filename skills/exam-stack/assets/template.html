@@ -4,131 +4,246 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Exam Stack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:wdth,wght@75..125,300..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..600;1,8..60,300..600&display=swap" rel="stylesheet">
 <style>
-/* One reading column; the stack is a list with large ordinals, the active task opens in place. Light only, system sans. */
+/* Editorial study-guide layout: a fixed contents rail on the left, one reading column on the right.
+   Serif for reading and headings, a wide uppercase sans for labels, one wine-red accent. */
 :root{
-  --bg:#ffffff; --surface:#ffffff; --ink:#16171a; --soft:#5a5d66; --faint:#9a9ca3; --line:#e5e6e9; --wash:#f5f6f8;
-  --accent:#1f4bd8; --good:#1d7a4f; --mid:#9a6200; --hard:#b4322b;
-  --f-body:"Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --bg:#F4F4F1; --ink:#22252E; --accent:#8A1C44; --on-accent:#fff;
+  --surface:#FBFBF8; --paper:#E2E5E3; --field:#ECEAE1; --cool:#CBD4D8;
+  --soft:color-mix(in srgb, var(--ink) 68%, var(--bg)); --faint:color-mix(in srgb, var(--ink) 42%, var(--bg));
+  --line:color-mix(in srgb, var(--ink) 16%, var(--bg)); --good:#2E6B4A; --warn:#8A5A12;
+  --serif:"Source Serif 4","Source Serif Pro",Georgia,"Times New Roman",serif;
+  --sans:"Hubot Sans","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  --rail:260px;
   color-scheme:light;
 }
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#17181C;--ink:#E7E5DF;--accent:#D9798F;--on-accent:#17181C;--surface:#1E2025;--paper:#24272D;--field:#262823;--cool:#2A3236;--good:#7CC29B;--warn:#E0B060;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#17181C;--ink:#E7E5DF;--accent:#D9798F;--on-accent:#17181C;--surface:#1E2025;--paper:#24272D;--field:#262823;--cool:#2A3236;--good:#7CC29B;--warn:#E0B060;color-scheme:dark}
+
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:780px;margin:0 auto;padding-block:56px 96px;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  display:flex;flex-direction:column;gap:40px}
-@media (max-width:560px){.wrap{padding-block:32px 72px;gap:32px}}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;font-optical-sizing:auto}
+a{color:var(--accent);text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+.label{font-family:var(--sans);font-stretch:125%;font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.sans{font-family:var(--sans)}
+p{margin:0}
 
-header{display:flex;flex-direction:column;gap:14px}
-.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
-h1{font-weight:700;font-size:clamp(34px,7vw,52px);line-height:1.08;letter-spacing:-.02em;margin:0;text-wrap:balance}
-h1 em{font-style:normal;color:var(--accent)}
-h2{font-weight:700;font-size:24px;line-height:1.2;margin:0}
-p{margin:0;max-width:62ch}
-.lede{font-size:17px;color:var(--soft);line-height:1.65}
-.small{font-size:13.5px;color:var(--soft)}
+/* ---------- rail ---------- */
+.rail{position:fixed;inset:0 auto 0 0;width:var(--rail);border-right:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;gap:22px;padding:28px 22px;overflow-y:auto;z-index:5}
+.mark{font-family:var(--sans);font-stretch:125%;font-weight:800;font-size:22px;letter-spacing:.04em;text-transform:uppercase;line-height:1;color:var(--ink);text-decoration:none}
+.rail .course{font-size:14px;color:var(--soft);line-height:1.4;margin-top:6px}
+.prog{display:flex;flex-direction:column;gap:6px}
+.prog .bar{height:3px;background:var(--line)}
+.prog .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .35s}
+.toc{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px;font-family:var(--sans);font-size:13px}
+.toc a{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:6px;align-items:baseline;padding:5px 6px;border-radius:4px;color:var(--ink);text-decoration:none}
+.toc a:hover{background:var(--field)}
+.toc .n{color:var(--faint);font-variant-numeric:tabular-nums}
+.toc .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toc .s{font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums}
+.toc li.done a{color:var(--faint)}
+.toc li.done .s{color:var(--good)}
+.toc li.next a{background:var(--field)}
+.toc li.next .n{color:var(--accent);font-weight:700}
+.toc .sep{font-family:var(--sans);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);padding:10px 6px 4px;border-top:1px solid var(--accent);margin-top:6px}
+.rail .foot{margin-top:auto;display:flex;flex-direction:column;gap:8px}
 
-.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
-.stat{display:flex;flex-direction:column;gap:2px;padding:16px 16px 14px 0}
-.stat+.stat{padding-left:16px;border-left:1px solid var(--line)}
-@media (max-width:560px){.summary{grid-template-columns:minmax(0,1fr)}.stat+.stat{padding-left:0;border-left:0;border-top:1px solid var(--line)}}
-.stat .v{font-weight:600;font-size:26px;line-height:1.15;font-variant-numeric:tabular-nums}
-.stat .k{font-size:13px;color:var(--soft)}
-.bar{height:3px;background:var(--line);margin-top:8px}
-.bar>i{display:block;height:100%;width:0;background:var(--accent);transition:width .35s}
-.save{font-size:13px;color:var(--faint);margin-top:-28px}
-.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--soft);align-items:center}
+/* ---------- main ---------- */
+main{margin-left:var(--rail);padding:56px max(24px,5vw) 120px;display:flex;justify-content:center}
+.col{width:100%;max-width:760px;display:flex;flex-direction:column;gap:44px}
+h1{font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,64px);line-height:1.04;letter-spacing:-.01em;margin:10px 0 0;text-wrap:balance}
+h1 em{font-style:italic;color:var(--accent)}
+h2{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.2;margin:0}
+.lede{font-size:19px;line-height:1.55;color:var(--soft);max-width:60ch;margin-top:18px}
 
+.profile{border-top:1px solid var(--ink);padding-top:18px;display:flex;flex-direction:column;gap:14px}
+.profile dl{margin:0;display:grid;grid-template-columns:minmax(120px,180px) minmax(0,1fr);gap:8px 20px;font-size:16px}
+.profile dt{font-family:var(--sans);font-stretch:125%;font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);padding-top:4px}
+.profile dd{margin:0}
+.profile ul{margin:0;padding-left:1.1em}
+@media (max-width:560px){.profile dl{grid-template-columns:minmax(0,1fr)}.profile dd{margin-bottom:6px}}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stat{padding:14px 14px 12px 0;display:flex;flex-direction:column;gap:2px}
+.stat+.stat{padding-left:14px;border-left:1px solid var(--line)}
+.stat .v{font-family:var(--serif);font-size:26px;font-weight:400;line-height:1.15;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:13px;color:var(--faint)}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat:nth-child(3){padding-left:0;border-left:0}.stat:nth-child(n+3){border-top:1px solid var(--line)}}
+.save{font-family:var(--sans);font-size:12px;color:var(--faint);margin-top:-30px}
+
+/* ---------- cards ---------- */
 .stack{display:flex;flex-direction:column}
-.card{border-bottom:1px solid var(--line)}
+.card{border-bottom:1px solid var(--line);scroll-margin-top:16px}
 .stack>.card:first-child{border-top:1px solid var(--line)}
-.head{width:100%;display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding:18px 0;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
-.head:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
-.rank{font-weight:600;font-size:30px;line-height:1;color:var(--faint);font-variant-numeric:tabular-nums}
-.card.next .rank{color:var(--accent)}
-.card.done .rank{color:var(--good);font-size:24px}
-.card:hover .rank{color:var(--ink)}
+.head{width:100%;display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:14px;align-items:baseline;padding:22px 0;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.num{font-family:var(--serif);font-weight:300;font-size:34px;line-height:1;color:var(--faint);font-variant-numeric:tabular-nums}
+.card.next .num{color:var(--accent)}
+.card.done .num{color:var(--good);font-size:26px}
+.head:hover .num{color:var(--ink)}
 .ttl{display:flex;flex-direction:column;gap:8px;min-width:0}
-.ttl b{font-weight:600;font-size:18px;line-height:1.3}
+.ttl b{font-family:var(--serif);font-weight:400;font-size:23px;line-height:1.25}
 .card.done .ttl b{color:var(--soft)}
-.chips{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:var(--soft)}
-.chip{white-space:nowrap}
-.chips>.chip+.chip::before{content:"·";margin-right:10px;color:var(--faint)}
-.chip.freq{color:var(--accent)}
-.chip.easy{color:var(--good)}
-.chip.med{color:var(--mid)}
-.chip.hard{color:var(--hard)}
-.chip.got{color:var(--good)}
-.chev{font-size:13px;font-weight:600;color:var(--faint)}
+.meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-family:var(--sans);font-size:12.5px;color:var(--soft)}
+.meta>span+span::before{content:"·";margin-right:12px;color:var(--faint)}
+.meta .freq{color:var(--accent);font-weight:600}
+.meta .easy{color:var(--good)} .meta .med{color:var(--warn)} .meta .hard{color:var(--accent)}
+.meta .score{color:var(--good);font-weight:600}
+.chev{font-family:var(--sans);font-stretch:125%;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
 .card.next .chev{color:var(--accent)}
 
-.body{padding:0 0 28px 80px;display:flex;flex-direction:column;gap:22px}
-@media (max-width:560px){.body{padding-left:0}.head{grid-template-columns:48px minmax(0,1fr) auto;gap:12px}}
-.why{font-size:15.5px;line-height:1.55;color:var(--soft);max-width:62ch}
-.recipe{display:flex;flex-direction:column;gap:8px;background:var(--wash);border-radius:12px;padding:16px 18px}
-.recipe h3,.ex h3{font-weight:600;font-size:13px;letter-spacing:.02em;margin:0;color:var(--soft)}
-.recipe ol{margin:0;padding:0;list-style:none;counter-reset:step;display:flex;flex-direction:column;gap:8px;font-size:15.5px}
-.recipe li{counter-increment:step;position:relative;padding-left:30px}
-.recipe li::before{content:counter(step) ".";position:absolute;left:0;top:0;font-weight:700;color:var(--accent)}
-.exs{display:flex;flex-direction:column;gap:14px}
-.ex{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;min-width:0}
-@media (max-width:560px){.ex{padding:14px}}
-.ex h3{color:var(--accent)}
-.ex .q{font-size:15.5px;overflow-x:auto}
-.ex .q p+p,.ex .a p+p{margin-top:8px}
-details.sol{border-top:1px solid var(--line);padding-top:12px}
-details.sol summary{cursor:pointer;font-weight:500;font-size:14px;list-style:none;display:inline-flex;gap:8px;align-items:center}
-details.sol summary::-webkit-details-marker{display:none}
-details.sol summary::before{content:"+";color:var(--accent);width:12px}
-details.sol[open] summary::before{content:"\2212"}
-details.sol summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
-details.sol .a{margin-top:12px;font-size:15px;overflow-x:auto}
-.ex table{border-collapse:collapse;font-size:14px;margin:8px 0;font-variant-numeric:tabular-nums}
-.ex th,.ex td{border-bottom:1px solid var(--line);padding:5px 12px 5px 0;text-align:left}
-.ex th{font-weight:500;color:var(--soft)}
-.exbtns,.cardbtns{display:flex;flex-wrap:wrap;gap:8px}
-.btn{font:500 14px var(--f-body);padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s}
-.btn:hover{border-color:var(--ink)}
-.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.btn.on{background:var(--ink);border-color:var(--ink);color:var(--surface)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
-.btn.primary:hover{filter:brightness(1.08)}
-.cut{display:flex;align-items:center;gap:14px;padding:22px 0 10px;font-weight:600;font-size:14px;color:var(--accent)}
+.body{padding:0 0 36px 76px;display:flex;flex-direction:column;gap:24px}
+@media (max-width:640px){.body{padding-left:0}.head{grid-template-columns:44px minmax(0,1fr) auto;gap:10px}.num{font-size:28px}}
+.why{color:var(--soft);font-size:17px}
+.note{font-family:var(--sans);font-size:13.5px;color:var(--warn);border-left:2px solid var(--warn);padding:2px 0 2px 12px}
+.graders{border-left:3px solid var(--accent);padding:4px 0 4px 16px;display:flex;flex-direction:column;gap:6px}
+.graders ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px}
+.recipe{background:var(--field);padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.recipe ol{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:8px}
+.recipe li{counter-increment:s;position:relative;padding-left:32px}
+.recipe li::before{content:counter(s);position:absolute;left:0;top:.1em;font-family:var(--sans);font-stretch:125%;font-weight:700;font-size:12px;color:var(--accent);width:22px;height:22px;border:1px solid var(--accent);border-radius:50%;display:grid;place-items:center}
+
+/* ---------- problems ---------- */
+.problems{display:flex;flex-direction:column;gap:22px}
+.problem{background:var(--surface);border:1px solid var(--line);padding:20px 22px 8px;min-width:0}
+@media (max-width:560px){.problem{padding:16px 14px 6px}}
+.problem>.src{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;margin-bottom:12px}
+.problem .intro{margin-bottom:6px}
+.part{border-top:1px solid var(--line);padding:14px 0;display:flex;flex-direction:column;gap:10px;min-width:0}
+.problem .intro+.part,.problem .src+.part{border-top:0;padding-top:4px}
+.qline{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:baseline}
+.plabel{font-family:var(--sans);font-weight:700;font-size:14px;color:var(--accent);white-space:nowrap}
+.plabel small{display:block;font-weight:500;font-size:11px;color:var(--faint);letter-spacing:.04em}
+.q,.sol,.intro{overflow-x:auto;overflow-y:hidden;padding-block:2px}
+.q p+p,.sol p+p,.intro p+p{margin-top:8px}
+.q img,.sol img,.intro img{max-width:100%;height:auto;display:block;margin:8px 0}
+.problem table{border-collapse:collapse;font-size:15px;margin:8px 0;font-variant-numeric:tabular-nums}
+.problem th,.problem td{border-bottom:1px solid var(--line);padding:4px 12px 4px 0;text-align:left;vertical-align:top}
+.problem th{font-family:var(--sans);font-weight:600;font-size:12px;color:var(--soft)}
+pre,code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.88em}
+pre{background:var(--field);padding:10px 12px;overflow-x:auto}
+
+details.ans{margin-left:0}
+details.ans>summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--accent);padding:2px 0}
+details.ans>summary::-webkit-details-marker{display:none}
+details.ans>summary::before{content:"+";width:14px;font-weight:700}
+details.ans[open]>summary::before{content:"\2212"}
+details.ans>summary .done-tag{color:var(--good);font-weight:600}
+.ansbody{margin-top:10px;padding:14px 16px;background:var(--bg);border-left:3px solid var(--ink);display:flex;flex-direction:column;gap:12px}
+.final{font-weight:600}
+.prov{font-family:var(--sans);font-size:11.5px;color:var(--faint)}
+.prov b{font-weight:600}
+.prov.reasoned b{color:var(--warn)}
+.rubric{display:flex;flex-direction:column;gap:6px;border-top:1px dashed var(--line);padding-top:10px}
+.rubric label{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:8px;align-items:baseline;font-size:15.5px;cursor:pointer}
+.rubric input{accent-color:var(--accent);margin:0;transform:translateY(2px)}
+.rubric .p{font-family:var(--sans);font-size:12px;color:var(--soft);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rubric .tot{font-family:var(--sans);font-size:13px;font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.rubric .tot span{color:var(--faint);font-weight:500}
+.rubric .btn{align-self:flex-start}
+
+.btn{font:600 13px var(--sans);padding:8px 14px;border-radius:2px;border:1px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;transition:background .15s,color .15s}
+.btn:hover{background:var(--ink);color:var(--bg)}
+.btn.on{background:var(--ink);color:var(--bg)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn.small{padding:5px 10px;font-size:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+.cut{display:flex;align-items:center;gap:14px;padding:26px 0 10px}
+.cut .label{color:var(--accent)}
 .cut::after{content:"";flex:1;border-top:1px solid var(--accent)}
-.pile{display:flex;flex-direction:column;gap:14px}
-.empty{padding:18px 0;color:var(--faint);font-size:14.5px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.empty{padding:20px 0;color:var(--faint);font-size:16px;font-style:italic;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.history{font-family:var(--sans);font-size:13px;color:var(--soft);display:flex;flex-direction:column;gap:4px}
 mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+dialog{border:1px solid var(--ink);background:var(--bg);color:var(--ink);padding:24px;max-width:440px;width:calc(100% - 32px)}
+dialog::backdrop{background:color-mix(in srgb, var(--ink) 40%, transparent)}
+dialog h2{font-size:24px;margin-bottom:10px}
+dialog p{font-size:16px;color:var(--soft);margin-bottom:16px}
+dialog .row{flex-direction:column;align-items:stretch}
+
+/* ---------- small screens: the rail becomes a header ---------- */
+@media (max-width:980px){
+  .rail{position:static;width:auto;border-right:0;border-bottom:1px solid var(--line);padding:18px 16px;gap:14px}
+  main{margin-left:0;padding:32px 16px 96px}
+  .rail .tocwrap:not([open]) .toc{display:none}
+}
+.tocwrap>summary{list-style:none;cursor:pointer}
+.tocwrap>summary::-webkit-details-marker{display:none}
+@media (min-width:981px){.tocwrap>summary{pointer-events:none}}
+@media (max-width:980px){.tocwrap>summary{display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.tocwrap>summary::after{content:"Show";color:var(--accent)}.tocwrap[open]>summary::after{content:"Hide"}.tocwrap[open] .toc{margin-top:8px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="eyebrow" id="eyebrow"></div>
-    <h1>The <em>exam</em> stack</h1>
-    <p class="lede" id="lede"></p>
-  </header>
-
-  <section class="summary" aria-label="Progress">
-    <div class="stat"><span class="v" id="sDone">0 / 0</span><span class="k">Tasks done</span><div class="bar"><i id="sBar"></i></div></div>
-    <div class="stat"><span class="v" id="sTime">–</span><span class="k">Left in the stack</span></div>
-    <div class="stat"><span class="v" id="sExam">–</span><span class="k">Until the exam</span></div>
-  </section>
-  <p class="save" id="saveNote">Progress is saved in this browser.</p>
-
-  <div class="legend" aria-hidden="true">
-    <span><span class="chip freq">6/6</span> · papers it was on</span>
-    <span>pts · typical points</span>
-    <span><span class="chip easy">easy</span> · <span class="chip med">medium</span> · <span class="chip hard">hard</span></span>
+<aside class="rail" aria-label="Contents">
+  <div>
+    <a class="mark" href="#top" id="mark">Exam</a>
+    <div class="course" id="railCourse"></div>
   </div>
+  <div class="prog">
+    <span class="label" id="railProg">0 / 0 done</span>
+    <div class="bar"><i id="railBar"></i></div>
+  </div>
+  <details class="tocwrap" id="tocwrap" open>
+    <summary class="label">Contents</summary>
+    <ol class="toc" id="toc"></ol>
+  </details>
+  <div class="foot">
+    <button class="btn small" type="button" id="restartBtn">Restart the stack…</button>
+  </div>
+</aside>
 
-  <section class="stack" id="stack" aria-label="Task stack"></section>
+<main id="top">
+  <div class="col">
+    <header>
+      <div class="label" id="eyebrow"></div>
+      <h1>The <em>exam</em> stack</h1>
+      <p class="lede" id="lede"></p>
+    </header>
 
-  <section class="pile" aria-labelledby="pileH">
-    <h2 id="pileH">Done</h2>
-    <div class="stack" id="pile"></div>
-  </section>
-</div>
+    <section class="profile" id="profile" aria-labelledby="profH" hidden>
+      <h2 id="profH">How this exam is graded</h2>
+      <dl id="profDl"></dl>
+    </section>
+
+    <section class="stats" aria-label="Progress">
+      <div class="stat"><span class="v" id="sDone">0 / 0</span><span class="label">Tasks done</span></div>
+      <div class="stat"><span class="v" id="sRound">1</span><span class="label">Round</span></div>
+      <div class="stat"><span class="v" id="sTime">–</span><span class="label">Left, roughly</span></div>
+      <div class="stat"><span class="v" id="sExam">–</span><span class="label">Until the exam</span></div>
+    </section>
+    <p class="save" id="saveNote">Progress is saved in this browser.</p>
+
+    <section aria-labelledby="stackH">
+      <h2 id="stackH" class="label" style="font-size:11px;margin-bottom:12px">The stack</h2>
+      <div class="stack" id="stack"></div>
+    </section>
+
+    <section aria-labelledby="pileH" style="display:flex;flex-direction:column;gap:14px">
+      <h2 id="pileH">Done this round</h2>
+      <div class="stack" id="pile"></div>
+      <div class="history" id="history"></div>
+    </section>
+  </div>
+</main>
+
+<dialog id="restartDlg" aria-labelledby="rdH">
+  <h2 id="rdH">Start a new round?</h2>
+  <p id="rdText">Your scores from this round are kept in the history. Nothing is deleted.</p>
+  <div class="row">
+    <button class="btn primary" type="button" id="rdAll">Restart every card</button>
+    <button class="btn" type="button" id="rdWeak">Restart only cards under 70%</button>
+    <button class="btn" type="button" id="rdCancel">Cancel</button>
+  </div>
+</dialog>
 
 <!-- build.mjs replaces the placeholder below with the contents of stack.json -->
 <script type="application/json" id="stack-data">/*__STACK__*/</script>
@@ -140,157 +255,314 @@ window.MathJax = { tex: { inlineMath: [["\\(","\\)"]], displayMath: [["\\[","\\]
 (function(){
   let S = {};
   try { S = JSON.parse(document.getElementById("stack-data").textContent); } catch(e) { S = {}; }
-  const C = S.course || {};
+  const C = S.course || {}, P = C.profile || null;
   const TASKS = S.tasks || [];
-  const DATA = S.exercises || {};
+  const EX = S.exercises || {};
   const BUDGET = C.studyMinutes || 0;
   const EASE = {easy:"easy", med:"medium", hard:"hard"};
+  const WEAK = 0.7;
+  const byId = Object.fromEntries(TASKS.map(t => [t.id, t]));
+  const rankOf = Object.fromEntries(TASKS.map((t, i) => [t.id, i + 1]));
 
-  document.title = (C.code ? C.code + " " : "") + "Exam Stack";
-  document.getElementById("eyebrow").textContent = [C.code && C.name ? C.code + " " + C.name : (C.name || C.code), C.examLabel].filter(Boolean).join(" · ");
-  document.getElementById("lede").textContent = TASKS.length + " tasks that keep coming back, in the order that earns the most points per hour. Each has a recipe and real questions from past papers with solutions. Do one, grade yourself, mark it done, move on.";
-
-  // ---- state: {status:{T1:"done"}, ex:{"T1-0":"got"|"again"}} ----
-  let state = {status:{}, ex:{}};
+  // ---------- state ----------
+  // {v:2, round, status:{T1:"done"}, marks:{"T1|ex|a":{t:[0,2]} | {g:"got"|"again"}, open:{key:1}}, history:[{round, ended, done, score}]}
+  const LS = "exam-stack-v2:" + (C.code || C.name || "course");
+  let state = fresh();
+  function fresh(){ return {v:2, round:1, status:{}, marks:{}, history:[]}; }
+  function normalize(s){
+    if (!s || typeof s !== "object") return fresh();
+    return {v:2, round:s.round || 1, status:Object.assign({}, s.status), marks:Object.assign({}, s.marks), history:Array.isArray(s.history) ? s.history.slice() : []};
+  }
+  try { const s = JSON.parse(localStorage.getItem(LS) || "null"); if (s) state = normalize(s); } catch(e) {}
   let ref = null, saving = false, pending = false;
-  const LS = "exam-stack:" + (C.code || C.name || "course");
-  try { const s = JSON.parse(localStorage.getItem(LS) || "null"); if (s && s.status) state = s; } catch(e) {}
-
   function persist(){
     try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e) {}
     if (!ref) return;
     if (saving) { pending = true; return; }
     saving = true;
-    ref.set({status: state.status, ex: state.ex, updated: Date.now()})
-      .catch(() => { setNote("Couldn't sync to your account right now; progress is kept in this browser."); })
+    ref.set(Object.assign({}, state, {updated: Date.now()}))
+      .catch(() => setNote("Couldn't sync to your account right now; progress is kept in this browser."))
       .finally(() => { saving = false; if (pending) { pending = false; persist(); } });
   }
   function setNote(t){ const n = document.getElementById("saveNote"); if (n) n.textContent = t; }
+  // Compare by content so a sync echo doesn't re-render and close open answers.
+  function stable(o){ return JSON.stringify([o.round, sortObj(o.status), sortObj(o.marks), o.history]); }
+  function sortObj(o){ return Object.keys(o || {}).sort().map(k => [k, o[k]]); }
 
-  // ---- render ----
-  const open = new Set();
-  const openSol = new Set();
-  // Compare states by content so a sync echo doesn't re-render (and close open solutions).
-  function stable(o){ const s = k => Object.keys(o[k] || {}).sort().map(x => x + "=" + o[k][x]).join(","); return s("status") + "|" + s("ex"); }
+  // ---------- scoring ----------
+  const key = (t, x, p) => t.id + "|" + x.id + "|" + p.label;
+  function partMax(p){ const it = p.rubric && p.rubric.items; return it && it.length ? it.reduce((s, i) => s + (+i.pts || 0), 0) : (+p.pts || 1); }
+  function partScore(t, x, p){
+    const m = state.marks[key(t, x, p)];
+    if (!m) return null;
+    const it = p.rubric && p.rubric.items;
+    if (it && it.length) { if (!m.t) return null; return m.t.reduce((s, i) => s + (+(it[i] && it[i].pts) || 0), 0); }
+    if (m.g === "got") return partMax(p);
+    if (m.g === "again" || m.g === "blank") return 0;
+    // with negative marking a wrong True/False or multiple-choice answer costs its points
+    if (m.g === "wrong") return P && P.negativeMarking ? -partMax(p) : 0;
+    return null;
+  }
+  function taskScore(t){
+    let got = 0, max = 0, any = false;
+    (EX[t.id] || []).forEach(x => (x.parts || []).forEach(p => { const s = partScore(t, x, p); if (s != null) { any = true; got += s; max += partMax(p); } }));
+    return any && max ? got / max : null;
+  }
+  const pct = v => Math.round(v * 100) + "%";
+
+  // ---------- helpers ----------
   function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
-  function nextId(){ const t = TASKS.find(t => state.status[t.id] !== "done"); return t ? t.id : null; }
+  function html(tag, cls, h){ const e = el(tag, cls); e.innerHTML = h; return e; }
+  function typeset(node){
+    // render() rebuilds the DOM, so a deferred typeset may hit a node that is gone; MathJax can't measure those.
+    if (!node || !node.isConnected || !window.MathJax || !MathJax.typesetPromise) return;
+    MathJax.typesetPromise([node]).catch(() => {});
+  }
+  const later = (n) => setTimeout(() => typeset(n), 0);
+  function roughHours(m){ if (!m) return "done"; const h = m / 60; return h < 1 ? "< 1 h" : "≈ " + (Math.round(h * 2) / 2).toString().replace(".5", "½") + " h"; }
+  const nextId = () => { const t = TASKS.find(t => state.status[t.id] !== "done"); return t ? t.id : null; };
 
-  function card(t, rank, isNext){
+  // ---------- static header ----------
+  const courseLine = [C.code, C.name].filter(Boolean).join(" ");
+  document.title = (C.code ? C.code + " · " : "") + "Exam Stack";
+  document.getElementById("mark").textContent = C.code || "Exam";
+  document.getElementById("railCourse").textContent = [C.name, C.examLabel].filter(Boolean).join(" · ");
+  document.getElementById("eyebrow").textContent = [courseLine, C.examLabel].filter(Boolean).join(" · ");
+  document.getElementById("lede").textContent = TASKS.length + " kinds of question that keep coming back on the past papers, in the order that earns the most points for your time. Each one has a recipe, what the graders give points for, and real exam questions with the answer right under every part.";
+  if (P) {
+    const dl = document.getElementById("profDl");
+    const add = (k, v) => { if (v == null || v === "" || (Array.isArray(v) && !v.length)) return; dl.appendChild(el("dt", null, k)); const dd = el("dd"); if (Array.isArray(v)) { const ul = el("ul"); v.forEach(x => ul.appendChild(html("li", null, x))); dd.appendChild(ul); } else dd.innerHTML = v; dl.appendChild(dd); };
+    add("Format", [P.duration, P.totalPoints != null ? P.totalPoints + " points" : null].filter(Boolean).join(", "));
+    add("Allowed", P.aids);
+    if (P.sections && P.sections.length) add("Sections", P.sections.map(s => s.name + (s.points != null ? " · " + s.points + " pts" : "") + (s.minimum != null ? " · <strong>minimum " + s.minimum + "</strong>" : "")));
+    add("Wrong answers", P.negativeMarking);
+    add("Choice", P.choice);
+    add("Graders expect", P.rules);
+    add("To pass", P.passRule);
+    document.getElementById("profile").hidden = !dl.children.length;
+  }
+
+  // ---------- render ----------
+  const open = new Set(), openAns = new Set();
+  function card(t, label, isNext){
     const done = state.status[t.id] === "done";
     const c = el("article", "card" + (isNext ? " next" : "") + (done ? " done" : ""));
     c.id = "card-" + t.id;
     const h = el("button", "head"); h.type = "button";
     h.setAttribute("aria-expanded", open.has(t.id) ? "true" : "false");
-    h.appendChild(el("span", "rank", String(rank)));
+    h.appendChild(el("span", "num", label));
     const ttl = el("span", "ttl");
     ttl.appendChild(el("b", null, t.title));
-    const chips = el("span", "chips");
-    if (t.freq) chips.appendChild(el("span", "chip freq", t.freq));
-    if (t.pts) chips.appendChild(el("span", "chip", t.pts + " pts"));
-    if (t.ease) chips.appendChild(el("span", "chip " + t.ease, EASE[t.ease] || t.ease));
-    if (t.min) chips.appendChild(el("span", "chip", "~" + t.min + " min"));
-    const exs = DATA[t.id] || [];
-    const got = exs.filter((_, i) => state.ex[t.id + "-" + i] === "got").length;
-    if (got) chips.appendChild(el("span", "chip got", got + "/" + exs.length + " solved"));
-    ttl.appendChild(chips);
+    const meta = el("span", "meta");
+    if (t.freq) meta.appendChild(el("span", "freq", "on " + t.freq + " papers"));
+    if (t.pts) meta.appendChild(el("span", null, t.pts + " pts"));
+    if (t.kind) meta.appendChild(el("span", null, t.kind.replace("-", "/")));
+    if (t.ease) meta.appendChild(el("span", t.ease, EASE[t.ease] || t.ease));
+    const sc = taskScore(t);
+    if (sc != null) meta.appendChild(el("span", "score", "scored " + pct(sc)));
+    ttl.appendChild(meta);
     h.appendChild(ttl);
-    h.appendChild(el("span", "chev", open.has(t.id) ? "close" : (isNext ? "start" : "open")));
+    h.appendChild(el("span", "chev", open.has(t.id) ? "Close" : (isNext ? "Start" : "Open")));
     h.addEventListener("click", () => { open.has(t.id) ? open.delete(t.id) : open.add(t.id); render(); });
     c.appendChild(h);
+    if (!open.has(t.id)) return c;
 
-    if (open.has(t.id)) {
-      const b = el("div", "body");
-      if (t.why) { const w = el("p", "why"); w.innerHTML = t.why; b.appendChild(w); }
-      if (t.recipe && t.recipe.length) {
-        const r = el("div", "recipe");
-        r.appendChild(el("h3", null, "Recipe" + (t.ref ? " · cheat sheet " + t.ref : "")));
-        const ol = el("ol");
-        t.recipe.forEach(step => { const li = el("li"); li.innerHTML = step; ol.appendChild(li); });
-        r.appendChild(ol);
-        b.appendChild(r);
-      }
-
-      const list = el("div", "exs");
-      if (!exs.length) list.appendChild(el("p", "small", "No past-exam question loaded for this task."));
-      exs.forEach((x, i) => {
-        const k = t.id + "-" + i;
-        const box = el("div", "ex");
-        box.appendChild(el("h3", null, [x.paper, x.q != null ? "Q" + x.q : null, x.pts != null ? x.pts + " pts" : null].filter(Boolean).join(" · ")));
-        const q = el("div", "q"); q.innerHTML = x.question; box.appendChild(q);
-        const d = el("details", "sol");
-        d.appendChild(el("summary", null, "Show solution"));
-        const a = el("div", "a"); a.innerHTML = x.solution; d.appendChild(a);
-        if (openSol.has(k)) { d.open = true; setTimeout(() => typeset(a), 0); }
-        d.addEventListener("toggle", () => { if (d.open) { openSol.add(k); typeset(a); } else openSol.delete(k); });
-        box.appendChild(d);
-        const btns = el("div", "exbtns");
-        const g = el("button", "btn" + (state.ex[k] === "got" ? " on" : ""), "I got it right"); g.type = "button";
-        const n = el("button", "btn" + (state.ex[k] === "again" ? " on" : ""), "Not yet"); n.type = "button";
-        g.addEventListener("click", () => { state.ex[k] = "got"; persist(); render(); });
-        n.addEventListener("click", () => { state.ex[k] = "again"; persist(); render(); });
-        btns.append(g, n);
-        box.appendChild(btns);
-        list.appendChild(box);
-      });
-      b.appendChild(list);
-
-      // Done cards move to the pile and can always be put back; nothing is ever deleted.
-      const cb = el("div", "cardbtns");
-      if (!done) {
-        const m = el("button", "btn primary", "Mark done → move to the pile"); m.type = "button";
-        m.addEventListener("click", () => { state.status[t.id] = "done"; open.delete(t.id); const nx = nextId(); if (nx) open.add(nx); persist(); render(); scrollToNext(); });
-        cb.appendChild(m);
-      } else {
-        const u = el("button", "btn", "Put back on the stack"); u.type = "button";
-        u.addEventListener("click", () => { delete state.status[t.id]; persist(); render(); });
-        cb.appendChild(u);
-      }
-      b.appendChild(cb);
-      c.appendChild(b);
-      setTimeout(() => { typeset(b.querySelector(".why")); typeset(b.querySelector(".recipe")); }, 0);
-      b.querySelectorAll(".ex .q").forEach(q => setTimeout(() => typeset(q), 0));
+    const b = el("div", "body");
+    if (t.why) b.appendChild(html("p", "why", t.why));
+    const missing = (t.after || []).filter(id => byId[id] && state.status[id] !== "done");
+    if (missing.length) {
+      const n = el("p", "note");
+      n.append("Builds on ");
+      missing.forEach((id, i) => { if (i) n.append(", "); const a = el("a", null, "§" + rankOf[id] + " " + byId[id].title); a.href = "#card-" + id; a.addEventListener("click", () => { open.add(id); render(); }); n.appendChild(a); });
+      n.append(". Do that first if it's new to you.");
+      b.appendChild(n);
     }
+    if (t.graders && t.graders.length) {
+      const g = el("div", "graders");
+      g.appendChild(el("span", "label", "What graders reward"));
+      const ul = el("ul"); t.graders.forEach(x => ul.appendChild(html("li", null, x))); g.appendChild(ul);
+      b.appendChild(g);
+    }
+    if (t.recipe && t.recipe.length) {
+      const r = el("div", "recipe");
+      r.appendChild(el("span", "label", "Recipe" + (t.ref ? " · cheat sheet " + t.ref : "")));
+      const ol = el("ol"); t.recipe.forEach(s => ol.appendChild(html("li", null, s))); r.appendChild(ol);
+      b.appendChild(r);
+    }
+
+    const list = el("div", "problems");
+    const exs = EX[t.id] || [];
+    if (!exs.length) list.appendChild(el("p", "empty", "No past-exam question loaded for this task."));
+    exs.forEach(x => list.appendChild(problem(t, x)));
+    b.appendChild(list);
+
+    const row = el("div", "row");
+    if (!done) {
+      const m = el("button", "btn primary", "Mark done → move to the pile"); m.type = "button";
+      m.addEventListener("click", () => { state.status[t.id] = "done"; open.delete(t.id); const nx = nextId(); if (nx) open.add(nx); persist(); render(); scrollTo(nx); });
+      row.appendChild(m);
+    } else {
+      const u = el("button", "btn", "Put back on the stack"); u.type = "button";
+      u.addEventListener("click", () => { delete state.status[t.id]; persist(); render(); });
+      row.appendChild(u);
+    }
+    b.appendChild(row);
+    c.appendChild(b);
+    b.querySelectorAll(".why,.graders,.recipe,.intro,.q").forEach(later);
     return c;
   }
 
-  function fmtMin(mins){ const h = Math.floor(mins / 60), m = mins % 60; return ((h ? h + " h " : "") + (m ? m + " min" : "")).trim(); }
-
-  function render(){
-    const stack = document.getElementById("stack"), pile = document.getElementById("pile");
-    stack.textContent = ""; pile.textContent = "";
-    const nx = nextId();
-    let mins = 0, cutDone = false, rank = 0;
-    TASKS.forEach(t => {
-      if (state.status[t.id] === "done") return;
-      rank++;
-      if (BUDGET && !cutDone && mins + (t.min || 0) > BUDGET && mins > 0) {
-        stack.appendChild(el("div", "cut", "about " + fmtMin(BUDGET) + " of work above this line"));
-        cutDone = true;
-      }
-      mins += t.min || 0;
-      stack.appendChild(card(t, rank, t.id === nx));
+  function problem(t, x){
+    const box = el("section", "problem");
+    const src = el("div", "src");
+    src.appendChild(el("span", "label", [x.paper, x.q != null ? "Question " + x.q : null].filter(Boolean).join(" · ")));
+    if (x.pts != null) src.appendChild(el("span", "label", x.pts + " pts"));
+    box.appendChild(src);
+    if (x.intro) box.appendChild(html("div", "intro", x.intro));
+    const parts = x.parts || [];
+    parts.forEach(p => {
+      const part = el("div", "part");
+      const ql = el("div", "qline");
+      if (parts.length > 1 || p.label) {
+        const lab = el("span", "plabel", "(" + p.label + ")");
+        if (p.pts != null) lab.appendChild(el("small", null, p.pts + " pt" + (p.pts == 1 ? "" : "s")));
+        ql.appendChild(lab);
+      } else ql.appendChild(el("span"));
+      ql.appendChild(html("div", "q", p.question));
+      part.appendChild(ql);
+      part.appendChild(answer(t, x, p));
+      box.appendChild(part);
     });
-    if (!rank) stack.appendChild(el("div", "empty", "Stack cleared. Sit a full past paper under time pressure, or reopen a task below."));
-    const doneTasks = TASKS.filter(t => state.status[t.id] === "done");
-    if (!doneTasks.length) pile.appendChild(el("div", "empty", "Tasks you mark done land here. Open one any time to redo a question."));
-    doneTasks.forEach(t => pile.appendChild(card(t, "✓", false)));
-
-    document.getElementById("sDone").textContent = doneTasks.length + " / " + TASKS.length;
-    document.getElementById("sBar").style.width = (TASKS.length ? 100 * doneTasks.length / TASKS.length : 0) + "%";
-    document.getElementById("sTime").textContent = mins ? "≈ " + fmtMin(mins) : "done";
+    return box;
   }
 
-  function scrollToNext(){
-    const nx = nextId(); if (!nx) return;
-    const c = document.getElementById("card-" + nx);
+  function answer(t, x, p){
+    const k = key(t, x, p);
+    const d = el("details", "ans");
+    const s = el("summary");
+    s.append("Answer" + (p.label ? " (" + p.label + ")" : ""));
+    const sc = partScore(t, x, p);
+    if (sc != null) s.appendChild(el("span", "done-tag", "· " + sc + " / " + partMax(p)));
+    d.appendChild(s);
+    const body = el("div", "ansbody");
+    if (p.answer) body.appendChild(html("p", "final", p.answer));
+    if (p.solution) body.appendChild(html("div", "sol", p.solution));
+    const PROV = {official:"from the official solution", recomputed:"numbers recomputed and checked", reasoned:"reasoned answer, not checkable by computation; read it critically"};
+    if (p.verified) { const pv = el("p", "prov " + p.verified); pv.append("Source: "); pv.appendChild(el("b", null, PROV[p.verified] || p.verified)); body.appendChild(pv); }
+
+    const it = p.rubric && p.rubric.items;
+    if (it && it.length) {
+      const r = el("div", "rubric");
+      r.appendChild(el("span", "label", "Points are given for" + (p.rubric.source === "inferred" ? " (inferred, no official rubric)" : p.rubric.source === "official" ? " (official rubric)" : "")));
+      const m = state.marks[k] || {};
+      const ticked = new Set(m.t || []);
+      it.forEach((item, i) => {
+        const lab = el("label");
+        const cb = el("input"); cb.type = "checkbox"; cb.checked = ticked.has(i);
+        cb.addEventListener("change", () => {
+          const cur = new Set((state.marks[k] && state.marks[k].t) || []);
+          cb.checked ? cur.add(i) : cur.delete(i);
+          state.marks[k] = {t: [...cur].sort((a, b) => a - b)};
+          persist(); render();
+        });
+        lab.append(cb);
+        lab.appendChild(html("span", null, item.text));
+        lab.appendChild(el("span", "p", (+item.pts || 0) + " pt" + (item.pts == 1 ? "" : "s")));
+        r.appendChild(lab);
+      });
+      const tot = el("div", "tot");
+      tot.appendChild(el("span", null, "Tick what you actually wrote."));
+      tot.append((sc != null ? sc : 0) + " / " + partMax(p));
+      r.appendChild(tot);
+      if (!m.t) {
+        const z = el("button", "btn small", "I wrote none of these"); z.type = "button";
+        z.addEventListener("click", () => { state.marks[k] = {t: []}; persist(); render(); });
+        r.appendChild(z);
+      }
+      body.appendChild(r);
+    } else {
+      const row = el("div", "row");
+      const m = state.marks[k] || {};
+      const choice = ["true-false", "multiple-choice"].includes(t.kind);
+      (choice ? [["got", "Right"], ["wrong", "Wrong"], ["blank", "Left blank"]] : [["got", "I got it"], ["again", "Not yet"]]).forEach(([v, txt]) => {
+        const bt = el("button", "btn small" + (m.g === v ? " on" : ""), txt); bt.type = "button";
+        bt.addEventListener("click", () => { state.marks[k] = {g: v}; persist(); render(); });
+        row.appendChild(bt);
+      });
+      body.appendChild(row);
+    }
+    d.appendChild(body);
+    if (openAns.has(k)) { d.open = true; later(body); }
+    d.addEventListener("toggle", () => { if (d.open) { openAns.add(k); typeset(body); } else openAns.delete(k); });
+    return d;
+  }
+
+  function render(){
+    const stack = document.getElementById("stack"), pile = document.getElementById("pile"), toc = document.getElementById("toc");
+    stack.textContent = ""; pile.textContent = ""; toc.textContent = "";
+    const nx = nextId();
+    let mins = 0, cut = false;
+    TASKS.forEach(t => {
+      const done = state.status[t.id] === "done";
+      const li = el("li", (done ? "done" : "") + (t.id === nx ? " next" : ""));
+      const a = el("a"); a.href = "#card-" + t.id;
+      a.appendChild(el("span", "n", String(rankOf[t.id])));
+      a.appendChild(el("span", "t", t.title));
+      const sc = taskScore(t);
+      a.appendChild(el("span", "s", done ? "✓" : (sc != null ? pct(sc) : "")));
+      a.addEventListener("click", () => { open.add(t.id); render(); if (matchMedia("(max-width: 980px)").matches) document.getElementById("tocwrap").open = false; });
+      li.appendChild(a);
+      if (done) { toc.appendChild(li); return; }
+      if (BUDGET && !cut && mins + (t.min || 0) > BUDGET && mins > 0) {
+        const line = el("div", "cut"); line.appendChild(el("span", "label", "Roughly " + roughHours(BUDGET).replace("≈ ", "") + " of work above this line")); stack.appendChild(line);
+        const sep = el("li", "sep", "Beyond your time"); toc.appendChild(sep);
+        cut = true;
+      }
+      mins += t.min || 0;
+      toc.appendChild(li);
+      stack.appendChild(card(t, String(rankOf[t.id]), t.id === nx));
+    });
+    if (!TASKS.some(t => state.status[t.id] !== "done")) stack.appendChild(el("div", "empty", "Stack cleared. Sit a full past paper under time pressure, or start a new round from the contents rail."));
+    const doneT = TASKS.filter(t => state.status[t.id] === "done");
+    if (!doneT.length) pile.appendChild(el("div", "empty", "Cards you mark done land here. Open one any time to redo a question."));
+    doneT.forEach(t => pile.appendChild(card(t, "✓", false)));
+
+    const hist = document.getElementById("history"); hist.textContent = "";
+    state.history.slice().reverse().forEach(h => hist.appendChild(el("span", null, "Round " + h.round + " · ended " + new Date(h.ended).toLocaleDateString() + " · " + h.done + " / " + TASKS.length + " cards done" + (h.score != null ? " · average " + pct(h.score) : ""))));
+
+    const n = doneT.length, N = TASKS.length;
+    document.getElementById("sDone").textContent = n + " / " + N;
+    document.getElementById("railProg").textContent = n + " / " + N + " done · round " + state.round;
+    document.getElementById("railBar").style.width = (N ? 100 * n / N : 0) + "%";
+    document.getElementById("sRound").textContent = state.round;
+    document.getElementById("sTime").textContent = roughHours(mins);
+  }
+
+  function scrollTo(id){
+    if (!id) return;
+    const c = document.getElementById("card-" + id);
     if (c) c.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start"});
   }
 
-  function typeset(node){
-    // render() rebuilds the DOM, so a deferred typeset may hit a node that is already gone; MathJax can't measure those.
-    if (!node || !node.isConnected || !window.MathJax || !MathJax.typesetPromise) return;
-    MathJax.typesetPromise([node]).catch(() => {});
+  // ---------- rounds ----------
+  const dlg = document.getElementById("restartDlg");
+  function restart(weakOnly){
+    const scores = TASKS.map(taskScore).filter(v => v != null);
+    state.history.push({round: state.round, ended: Date.now(), done: TASKS.filter(t => state.status[t.id] === "done").length, score: scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null});
+    const keep = {};
+    if (weakOnly) TASKS.forEach(t => { const sc = taskScore(t); if (state.status[t.id] === "done" && sc != null && sc >= WEAK) keep[t.id] = "done"; });
+    state.status = keep;
+    // cards that stay done keep their scores; everything back on the stack starts clean
+    state.marks = Object.fromEntries(Object.entries(state.marks).filter(([k]) => keep[k.split("|")[0]]));
+    state.round += 1;
+    open.clear(); openAns.clear();
+    const nx = nextId(); if (nx) open.add(nx);
+    persist(); render(); scrollTo(nx);
   }
+  document.getElementById("restartBtn").addEventListener("click", () => { if (dlg.showModal) dlg.showModal(); else if (confirm("Start a new round with every card back on the stack?")) restart(false); });
+  document.getElementById("rdAll").addEventListener("click", () => { dlg.close(); restart(false); });
+  document.getElementById("rdWeak").addEventListener("click", () => { dlg.close(); restart(true); });
+  document.getElementById("rdCancel").addEventListener("click", () => dlg.close());
 
   function examClock(){
     const t = document.getElementById("sExam");
@@ -298,15 +570,20 @@ window.MathJax = { tex: { inlineMath: [["\\(","\\)"]], displayMath: [["\\[","\\]
     if (isNaN(exam)) { t.textContent = "–"; return; }
     const d = exam - Date.now();
     if (d <= 0) { t.textContent = "started"; return; }
-    const hrs = Math.floor(d / 3600000), mins = Math.floor((d % 3600000) / 60000);
-    t.textContent = hrs >= 48 ? Math.floor(hrs / 24) + " days" : hrs + " h " + mins + " min";
+    const hrs = Math.floor(d / 3600000), m = Math.floor((d % 3600000) / 60000);
+    t.textContent = hrs >= 48 ? Math.floor(hrs / 24) + " days" : hrs + " h " + m + " min";
   }
 
+  // The contents list is always open in the side rail; on narrow screens it collapses into the header.
+  const narrow = matchMedia("(max-width: 980px)");
+  const syncToc = () => { document.getElementById("tocwrap").open = !narrow.matches; };
+  syncToc();
+  narrow.addEventListener ? narrow.addEventListener("change", syncToc) : narrow.addListener(syncToc);
   const first = nextId(); if (first) open.add(first);
   render(); examClock(); setInterval(examClock, 60000);
-  if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(() => document.querySelectorAll(".why,.recipe,.ex .q").forEach(typeset));
+  if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(() => document.querySelectorAll(".why,.graders,.recipe,.intro,.q,.profile").forEach(typeset));
 
-  // ---- optional: sync across devices when hosted as a claude.ai Artifact with the db + user capabilities ----
+  // ---------- optional: sync across devices when hosted as a claude.ai Artifact with db + user ----------
   (async () => {
     if (!window.claude || !claude.use) return;
     const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
@@ -318,21 +595,18 @@ window.MathJax = { tex: { inlineMath: [["\\(","\\)"]], displayMath: [["\\[","\\]
     let firstSnap = true;
     ref.onSnapshot(snap => {
       if (snap.exists) {
-        const d = snap.data() || {};
-        const remote = {status: Object.assign({}, d.status || {}), ex: Object.assign({}, d.ex || {})};
+        const remote = normalize(snap.data());
         if (firstSnap) {
-          // merge anything done in this browser before sync started
-          const merged = {status: Object.assign({}, remote.status, state.status), ex: Object.assign({}, remote.ex, state.ex)};
+          // merge anything done in this browser before sync started (same round only)
+          const merged = remote.round === state.round ? normalize({round: remote.round, status: Object.assign({}, remote.status, state.status), marks: Object.assign({}, remote.marks, state.marks), history: remote.history.length >= state.history.length ? remote.history : state.history}) : (remote.round > state.round ? remote : state);
           const changed = stable(merged) !== stable(remote);
-          state = merged;
-          if (changed) persist();
-          render();
+          state = merged; if (changed) persist(); render();
         } else if (stable(remote) !== stable(state)) {
           state = remote;
           try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e) {}
           render();
         }
-      } else if (firstSnap && (Object.keys(state.status).length || Object.keys(state.ex).length)) {
+      } else if (firstSnap && (Object.keys(state.status).length || Object.keys(state.marks).length || state.history.length)) {
         persist();
       }
       firstSnap = false;

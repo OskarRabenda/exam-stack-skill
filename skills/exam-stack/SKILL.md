@@ -1,118 +1,108 @@
 ---
 name: exam-stack
-description: Turn a course's past exams into a prioritized, interactive study page (an "exam stack"). It finds which question types recur on every paper, ranks them by points per hour of study, and gives each one a short solving recipe plus real past-exam questions with verified worked solutions, self-grading buttons and saved progress. Use this whenever a student wants to prepare for an exam from past papers, asks what keeps coming back on an exam, wants a study plan, practice set or priority list for a test, has limited time before an exam and wants to maximize points, or shares a folder of past exams, solutions or lecture notes and asks for help studying, even if they never say "stack".
+description: Turn a large pool of past written exams into a prioritized, interactive study page (an "exam stack"). It counts which question types recur across the papers, ranks them by points for the time they take, and gives each one a solving recipe, what graders give points for, and real past-exam questions with the answer directly under every part, a tickable rubric for self-scoring, and rounds the student can restart. Use this whenever a student has many past exam papers and wants to prepare from them, asks what keeps coming back on an exam, wants a study plan, practice set or priority list for a written exam, or shares a folder of past papers, solutions or rubrics and asks for help studying, even if they never say "stack".
 ---
 
 # Exam stack
 
-An exam stack is a single HTML page that answers one question for a student: *with the time I have left, what should I practise, in what order, and with which real exam questions?*
+An exam stack is one HTML page that answers a student's question: *with the time I have left, what should I practise, in what order, with which real exam questions, and how will it be graded?*
 
-It has a header (exam countdown, tasks done, time left in the stack) and a ranked list of **task cards**. A task is one recurring *kind* of exam question, for example "compute an inverse with the extended Euclidean algorithm" or "derive the MLE of a distribution". Each card holds:
+It shows how the exam is graded, then a ranked list of **task cards**. A task is one recurring *kind* of question ("compute an inverse with the extended Euclidean algorithm", "True/False on definitions", "explain why TCP needs a three-way handshake"). Each card holds:
 
-- why it sits at this rank (how often it appears and what it's worth)
-- a 3–6 step **recipe** for solving it
-- 1–4 **real past-exam questions** with worked solutions and the point split
-- "I got it right" / "Not yet" buttons per question, and "Mark done" for the card
+- why it sits at this rank
+- **what graders reward** on this kind of question
+- a short **recipe** for answering it
+- real past-exam questions where **every part has its answer directly under it**, with a **rubric checklist** the student ticks to score themselves
 
-Done cards move to a Done pile and can always be put back. A line in the list shows where the student's time budget runs out.
+Cards move to a Done pile and can always be put back. **Restart the stack** starts a new round (all cards, or only those scored under 70%), and earlier rounds stay in the history.
 
-The value comes from two things the student can't easily do alone: **the ranking**, which comes from counting what actually appears on past papers, and **trustworthy solutions**, which are verified, not guessed. Spend your effort there. The page itself is a template.
+The value is in two things a student can't easily do alone: **an honest ranking** counted from many papers, and **trustworthy answers with the real point split**. Spend your effort there. The page is a template.
 
-## Workflow
+## Scope
 
-### 1. Gather the inputs, then ask what's missing
+- **Written exams only**, with a **large pool of past papers** (as a rule of thumb, at least 4; more is better). The ranking is a count, and a count over two papers isn't one.
+- Not for oral exams, lab or practical exams, take-home projects, or courses with no past papers. If that's the situation, say so and stop rather than building something that looks authoritative but isn't.
 
-Look for these before asking anything. They're often in the folder the user points you to.
+## Phases
 
-| Input | Why it matters |
-|---|---|
-| Past exam papers (as many years as exist), plus solutions or rubrics | The only source of exercises and of the frequency ranking |
-| Lecture notes / course text | To write recipes in the course's own notation and terminology |
-| Exam facts: date and time, length, total points, allowed aids (cheat sheet? calculator?) | Countdown, and how recipes should be phrased |
-| Pass rule and the student's current coursework points | For the expected-score estimate at the end |
-| The student's cheat sheet, if any | Recipes must match it word for word, so the student practises with the sheet they'll actually have |
+### 0. Gate: is there a pool?
+List the past papers you can find (and their solutions or rubrics). If there are fewer than about 4 written papers, tell the user the ranking would be guesswork and ask whether they can find more before going on.
 
-Then ask, in one batch (use a question tool if available), only what you couldn't find:
-- How much study time is left? This sets the cut line.
-- Which topics do they already know well? Those cards drop down the list, or get one exercise each.
-- Confirm that exercises come **only from real past exams**. Students trust this, and invented questions in the style of the exam are easy to get subtly wrong.
+### 1. Gather and ask
+Find these before asking anything; they're usually in the folder the user points you to:
+- the past papers, plus official solutions, rubrics and grading notes
+- lecture notes, to write recipes in the course's own notation
+- the student's cheat sheet, if one is allowed (recipes must match it word for word)
+- the exam date and time, and the student's coursework points if the pass rule depends on them
 
-### 2. Frequency research: what keeps coming back
+Then ask, in one batch, only what you couldn't find: how much study time is left (a rough number is fine), which topics they already know, and confirm that exercises come only from real past papers.
 
-This step drives everything else, so be thorough.
+### 2. Exam profile: how is it graded?
+Read the cover pages and instructions of the papers and write down how the exam is graded: duration, total points, allowed aids, sections with **minimum scores**, **negative marking**, **choice questions**, answering rules ("justify every answer") and the pass rule. These change the strategy, not just the header. A section minimum can force a low-value card up, negative marking needs a "when to leave it blank" line, and a closed-book exam means recipes must be memorized. Read `references/exam-profile.md`.
 
-1. Go through every past paper, sub-question by sub-question. For each one, record: paper/year, question number, points, topic, and the **task type** (the repeatable skill being tested, not the chapter).
-2. Merge sub-questions that test the same skill under one task type, even when the wording or numbers differ.
-3. Aggregate per task type:
-   - **papers it appeared on** (e.g. 6/6)
-   - **typical points** when it appears (e.g. 8–13)
-   - **share of all points** across the papers
-4. Write this up as `recurring-exam-questions.md` in the user's folder: a ranked table plus one line per task on what the question usually looks like. The student will reread it, and it justifies the order of the stack.
+### 3. Tally and rank
+Go through every paper, sub-question by sub-question, and record a tally row: paper, question number, points, **task type** (the skill being tested, not the chapter), and **kind** (calculation, explain, recall, proof, multiple-choice, true-false). Whenever a rubric or solution shows how points were split, note that too; you'll need it in phase 5.
 
-Read `references/frequency-research.md` for the table format and how to handle edge cases (papers with different total points, resits, renamed topics, optional questions).
+Then let the script do the counting:
 
-### 3. Define and rank the tasks
+```bash
+node <skill-dir>/scripts/tally.mjs tally.csv --minutes minutes.json --md recurring-exam-questions.md
+```
 
-Aim for **12–18 tasks**. Fewer and the cards get too broad to have one recipe. More and the student can't finish. For each task, set:
+It reports, per task: papers it appeared on, typical points, share of all points (papers normalized to 100), the year last seen, and, with rough minutes per task, expected points per hour. Read `references/frequency-research.md` for the tally format and edge cases.
 
-- `freq`: papers it appeared on
-- `pts`: typical points
-- `ease`: `easy` / `med` / `hard`, meaning how quickly a student at this level can learn to score on it
-- `min`: realistic minutes to learn the recipe and do one exercise
-- `why`: one sentence that tells the student why this card is at this rank
+Use the table to set the stack order, then adjust it by judgment where the profile demands (section minimums, prerequisites a task builds on, topics that recently dropped out of the syllabus). Aim for roughly 12–20 tasks. Fewer and cards get too broad for one recipe; more and the student can't finish. Minutes are a rough estimate; don't spend time refining them.
 
-**Order by expected points per minute**, which is roughly (share of points × chance it appears) ÷ minutes. In practice: on every paper and quick goes first, big but long goes in the middle, rare or hard goes last. Small "free points" tasks (two-line answers that are always asked) belong near the top even though they're worth little, because they cost almost nothing. A rare question can still rank high if it's easy and big when it appears.
+Save `recurring-exam-questions.md` in the user's folder. The student will reread it.
 
-Set `course.studyMinutes` to the student's budget. The page draws the cut line where the cumulative minutes pass it.
+### 4. Write the cards
+For each task, set `kind`, `why`, `graders` and `recipe` (and `after` if it builds on another task).
 
-### 4. Write the recipes
+- **`graders`, what graders reward:** 1–3 sentences on what earns and loses points on *this kind* of question, from official rubrics where they exist and otherwise from patterns across the papers' solutions. For example: "Each division step must be verified; a correct inverse without the checks loses 3 of 10." This is often the most useful line on the card.
+- **Recipe:** 3–6 numbered steps the student follows *in the exam*, in the course's notation, including the trap that costs points. If the student has a cheat sheet, copy its text exactly and set `ref`. If they're allowed one but don't have one, offer to write it first and derive the recipes from it.
+- **Kind-specific:** true-false and multiple-choice cards need a recipe for deciding *and* for when to leave it blank (if wrong answers cost points). Explain and proof cards need an answer *structure* (what a full-marks answer contains), since there is no calculation to follow.
 
-3–6 numbered steps per task. Write the steps a student follows **during the exam**, in the course's notation, not a theory summary. Good steps name the concrete action and the check: "Factor q − 1; for each distinct prime r compute x^{(q−1)/r}; all ≠ 1 ⇒ primitive". Include the trap that costs points, if there is one.
+### 5. Exercises: answers under every part
+Per task, pick **2–4 real past-paper questions**, newest first, varied across years. For each one:
 
-If the student has a cheat sheet, copy its text **exactly** and set `ref` to its label, so card and sheet never disagree. If they don't have one but are allowed one, offer to write the cheat sheet first and derive the recipes from it.
+1. **Split it into parts exactly as the paper does.** Every sub-question, every True/False statement, every multiple-choice item is its own part with its own answer directly beneath it. A block of 16 True/False statements is one exercise with 16 parts. A shared stem (definitions, a given table, a figure) goes in `intro`. This matters: a student checks one answer at a time, and answers collected at the end are unusable.
+2. **Transcribe faithfully**, including hints, given tables and figures (save figures as image files and reference them; the build inlines them).
+3. **Write the solution** in the style the grader rewards (justification lines, intermediate steps), and for true-false / multiple-choice give the short `answer` plus a one-line reason.
+4. **Write the rubric** whenever you have the information: one item per thing the grader gives points for, with its points, marked `official` (from a rubric or grading notes) or `inferred` (your reading of how this course grades). Any part worth more than 1 point should have at least an inferred rubric. Read `references/grading.md`.
+5. **Verify and label the source** (`verified`):
+   - `official`: taken from an official solution
+   - `recomputed`: every number checked with a quick script
+   - `reasoned`: an explanation or argument that can't be recomputed
 
-### 5. Collect the exercises and write verified solutions
+   A wrong answer teaches a mistake the night before the exam. Recompute every calculation. For `reasoned` answers, check them against the lecture notes and keep them short and sourced.
 
-Per task, pick **1–4 real exam questions**, newest first. Prefer variety (different years, different twists) over repeats.
+For a big course, split phases 3–5 across subagents (e.g. one per part of the course). Give each one the task list, the paper paths and `references/stack-json.md`, have it verify its own numbers, then spot-check their output yourself.
 
-For each exercise:
-- Transcribe the question faithfully, including given hints, tables and the point value. Keep the paper's own numbering in `q`.
-- Write a step-by-step solution in the style the grader rewards (justify each claim, show the intermediate steps the rubric checks), ending with the **point split**: the official rubric if it exists, otherwise your best inference, labelled "inferred".
-- **Verify it.** Recompute every number with a short script (node or python), and check against the official solution or the exam PDF when available. A wrong solution on a card teaches the student a mistake the night before the exam, which is worse than no solution at all. If you can't verify something, say so in the solution.
-
-For a large course, split the extraction across subagents (e.g. one per half of the course or per group of tasks). Give each one the task list, the paper paths and the exercise format, and have it verify its own numbers. Then spot-check their output yourself.
-
-### 6. Build the page
-
-Write everything into one `stack.json` (format and a full example in `references/stack-json.md`), then run the build script:
+### 6. Build and check
+Write everything to one `stack.json` (format and full example: `references/stack-json.md`, `assets/example-stack.json`), then:
 
 ```bash
 node <skill-dir>/scripts/build.mjs path/to/stack.json path/to/exam-stack.html
 ```
 
-The script validates the data (unique ids, every exercise has a question and solution, a valid exam date), escapes `<` inside math so formulas survive HTML parsing, embeds the JSON safely in `assets/template.html`, and prints any warnings. Fix all errors, and read the warnings. "Task with no exercises" usually means a gap in step 5.
+The build validates the data, inlines images, makes math HTML-safe and embeds everything in `assets/template.html`. Fix every error, and read the warnings. "Question and solution both hold a list" almost always means statements that should be separate parts. "No rubric" means the grading information is missing.
 
-Math is written as `\( … \)` (inline) and `\[ … \]` (display) and rendered by MathJax. Plain HTML is allowed in questions and solutions (`<p>`, `<ol>`, `<table>`, `<strong>`).
+Open the page and check: the profile reads right, the top card opens, the math renders, every part's answer opens right under it, ticking rubric items updates the score, restart works, and it fits a phone screen.
 
-Then **open the page and check it**: the top card opens, the math renders, solutions expand, buttons stick after a reload, and it works at phone width.
-
-**Deliver it** in the most durable way the environment offers:
-- If you can publish HTML as a hosted page (e.g. a claude.ai Artifact), publish it. If that host supports per-user storage, declare it: the template already syncs progress to `data/users/<uid>/stack` through `claude.use("db")` and `claude.use("user")` when they're available, and falls back to `localStorage` otherwise.
-- Otherwise, save `exam-stack.html` in the user's folder. It works as a local file opened in any browser, with progress kept in that browser.
+**Deliver it** in the most durable way available. Publish it as a hosted page if you can (e.g. a claude.ai Artifact; declare per-user storage if offered, since the template syncs progress through `claude.use("db")` / `claude.use("user")` when available). Otherwise save `exam-stack.html` in the user's folder. It works as a local file, with progress kept in the browser.
 
 ### 7. Wrap up
-
-- **Back up** `stack.json`, the built page and `recurring-exam-questions.md` in the user's folder. The student will want to change it later, and a rebuild from `stack.json` takes seconds.
-- Give an **expected-score estimate**: points covered by all cards (from the frequency research) × a realistic success rate (75–85% for practised tasks), plus a little partial credit elsewhere, converted to a final grade with the course's weights if known. Also say where the "minimum safe" cut is, i.e. how far down the stack the student must get to pass with a margin. Be honest that this assumes the next paper looks like the past ones.
+- Keep `stack.json`, `tally.csv`, the built page and `recurring-exam-questions.md` in the user's folder. Changes later are an edit to `stack.json` plus a rebuild.
+- Give a **rough** expected score: the share of points the cards cover × a realistic success rate (say 75–85% for practised tasks), turned into a grade using the profile's pass rule. Say how far down the stack the student must get to pass with a margin. Present it as an estimate that assumes the next paper looks like the past ones, not a promise.
 
 ## Principles
 
-- **Real exam questions only.** Never invent exercises "in the style of" the exam unless the student explicitly asks, and then label them clearly.
-- **Never delete a card.** Done means "moved to the pile", which keeps the record. If the student asks to remove one, move it to the pile.
-- **Verified over complete.** A card with two verified exercises beats one with four unchecked ones.
-- **Plain, step-by-step language.** Students use this under time pressure. Short steps, the course's notation, no lecture-style detours.
-- **Keep the student's own material authoritative.** Their cheat sheet and their course's conventions win over your preferred notation.
+- **Real exam questions only.** Never invent exercises in the exam's style unless the student asks, and then label them clearly.
+- **Every answer sits under its own question.**
+- **Make grading explicit.** If you know what graders give points for, it goes on the card (`graders`) and on the part (`rubric`), labelled official or inferred.
+- **Nothing is deleted.** Done cards go to the pile, restarts keep the history, and a card the student wants gone goes to the pile.
+- **Verified over complete.** Two verified exercises beat four unchecked ones; say which answers are reasoned rather than recomputed.
+- **The student's material is authoritative.** Their cheat sheet and the course's notation win over yours.
 
 ## Updating an existing stack
-
-When the student asks for a change (reorder, add a question, fix a solution, new time budget), edit `stack.json` and rebuild. Don't hand-edit the built HTML. Keep task `id`s stable, because saved progress is keyed by them. If the stack was published as a hosted page, republish to the same address so their progress and link survive.
+Edit `stack.json` and rebuild; never hand-edit the built HTML. Keep task `id`s and exercise `id`s stable, since saved progress is keyed by them. Add new exercises with new ids rather than reusing old ones. If the stack was published as a hosted page, republish to the same address so the student's link and progress survive.

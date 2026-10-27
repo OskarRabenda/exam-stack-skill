@@ -4,17 +4,53 @@
     "name": "Linear Algebra (format example: invented questions)",
     "examLabel": "Fri 12 Jun · 13:30",
     "examStart": "2027-06-12T13:30:00+02:00",
-    "studyMinutes": 45
+    "studyMinutes": 60,
+    "profile": {
+      "duration": "3 hours",
+      "totalPoints": 100,
+      "aids": "Closed book. A simple calculator is allowed.",
+      "sections": [
+        { "name": "Part A: true/false", "points": 24, "minimum": 0 },
+        { "name": "Part B: open questions", "points": 76, "minimum": 30 }
+      ],
+      "negativeMarking": "Part A: +2 for a correct answer, −2 for a wrong one, 0 for blank. Only answer when you are sure.",
+      "rules": ["Justify every answer in part B; a bare result scores 0.", "Show intermediate steps; they carry most of the points."],
+      "passRule": "At least 30 points in part B and a total of at least 55."
+    }
   },
   "tasks": [
     {
       "id": "T1",
+      "title": "True/False on core definitions",
+      "kind": "true-false",
+      "section": "Part A: true/false",
+      "freq": "5/5",
+      "pts": "12–24",
+      "ease": "easy",
+      "min": 20,
+      "why": "On every paper and pure recall. But a wrong answer costs as much as a right one earns.",
+      "graders": [
+        "Only the True/False mark is graded; no explanation is read.",
+        "A wrong answer scores −2, so leave a statement blank unless you can name the rule or a counterexample."
+      ],
+      "ref": "S0",
+      "recipe": [
+        "For each statement, look for the hidden word: <em>every</em>, <em>square</em>, <em>rows</em> vs <em>columns</em>.",
+        "True only if you can name the theorem; False only if you can name a counterexample.",
+        "Neither? Leave it blank."
+      ]
+    },
+    {
+      "id": "T2",
       "title": "Determinant of a 3×3 matrix",
+      "kind": "calculation",
+      "section": "Part B: open questions",
       "freq": "5/5",
       "pts": "3–4",
       "ease": "easy",
       "min": 15,
-      "why": "On every paper and pure routine, so it's cheap points.",
+      "why": "On every paper and routine, so the points are cheap.",
+      "graders": ["The expansion with its signs is worth half the points, even if the final value is off."],
       "ref": "S1",
       "recipe": [
         "Pick the row or column with the most zeros.",
@@ -23,13 +59,17 @@
       ]
     },
     {
-      "id": "T2",
+      "id": "T3",
       "title": "Inverse of a 2×2 matrix",
+      "kind": "calculation",
+      "section": "Part B: open questions",
       "freq": "4/5",
-      "pts": "2–3",
+      "pts": "3",
       "ease": "easy",
       "min": 10,
       "why": "One formula. The only trap is forgetting to check that \\(\\det\\ne0\\).",
+      "graders": ["Checking \\(\\det\\ne0\\) is a separate point.", "The check \\(AA^{-1}=I\\) is a separate point."],
+      "after": ["T2"],
       "ref": "S2",
       "recipe": [
         "Compute \\(\\det=ad-bc\\). If it is 0, there is no inverse.",
@@ -38,47 +78,124 @@
       ]
     },
     {
-      "id": "T3",
-      "title": "Eigenvalues and definiteness of a symmetric 2×2 matrix",
+      "id": "T4",
+      "title": "Eigenvalues, eigenvectors and definiteness",
+      "kind": "calculation",
+      "section": "Part B: open questions",
       "freq": "3/5",
-      "pts": "4–6",
+      "pts": "6–9",
       "ease": "med",
       "min": 25,
-      "why": "Worth more than the first two, but needs the characteristic polynomial done carefully.",
+      "why": "Worth more than the others, but the characteristic polynomial needs care.",
+      "graders": ["Each eigenvector must be checked with \\(Av=\\lambda v\\) for its point.", "The definiteness conclusion needs a reason (the signs of the eigenvalues)."],
       "ref": "S3",
       "recipe": [
         "Characteristic polynomial: \\(\\lambda^2-\\operatorname{tr}(A)\\lambda+\\det A=0\\).",
-        "Solve for \\(\\lambda\\).",
-        "All \\(\\lambda>0\\): positive definite. Any \\(\\lambda<0\\) together with one \\(>0\\): indefinite."
+        "For each \\(\\lambda\\), solve \\((A-\\lambda I)v=0\\) and check \\(Av=\\lambda v\\).",
+        "All \\(\\lambda>0\\): positive definite. Mixed signs: indefinite."
       ]
     }
   ],
   "exercises": {
     "T1": [
       {
+        "id": "A-1",
         "paper": "Example paper A",
-        "q": "2a",
-        "pts": 4,
-        "question": "<p>Compute \\(\\det\\begin{pmatrix}1&2&0\\\\0&1&3\\\\2&0&1\\end{pmatrix}\\).</p>",
-        "solution": "<ol><li>Expand along row 1 (it has a zero): \\(1\\cdot\\det\\begin{pmatrix}1&3\\\\0&1\\end{pmatrix}-2\\cdot\\det\\begin{pmatrix}0&3\\\\2&1\\end{pmatrix}+0\\).</li><li>\\(=1\\cdot1-2\\cdot(0-6)=1+12=\\mathbf{13}\\).</li></ol><p><em>Rubric (4, inferred):</em> 2 for the expansion with signs, 2 for the value.</p>"
+        "q": "1",
+        "pts": 12,
+        "intro": "<p>Decide for each statement whether it is true or false. \\(A\\) and \\(B\\) are real \\(n\\times n\\) matrices unless stated otherwise.</p>",
+        "parts": [
+          { "label": "a", "pts": 2, "question": "<p>Every square matrix has an inverse.</p>", "answer": "False", "solution": "<p>Counterexample: the zero matrix (or any matrix with \\(\\det A=0\\)).</p>", "verified": "reasoned" },
+          { "label": "b", "pts": 2, "question": "<p>\\(\\det(AB)=\\det(A)\\det(B)\\).</p>", "answer": "True", "solution": "<p>The determinant is multiplicative.</p>", "verified": "reasoned" },
+          { "label": "c", "pts": 2, "question": "<p>If \\(Ax=0\\) has only the solution \\(x=0\\), then \\(A\\) is invertible.</p>", "answer": "True", "solution": "<p>For a square matrix, a trivial null space means full rank, so \\(A\\) is invertible.</p>", "verified": "reasoned" },
+          { "label": "d", "pts": 2, "question": "<p>The eigenvalues of a triangular matrix are its diagonal entries.</p>", "answer": "True", "solution": "<p>\\(\\det(A-\\lambda I)\\) is the product of the diagonal entries \\(a_{ii}-\\lambda\\).</p>", "verified": "reasoned" },
+          { "label": "e", "pts": 2, "question": "<p>For an \\(m\\times n\\) matrix, \\(\\operatorname{rank}A+\\operatorname{nullity}A=m\\).</p>", "answer": "False", "solution": "<p>The rank–nullity theorem gives \\(n\\), the number of <em>columns</em>. The hidden word is \"rows\".</p>", "verified": "reasoned" },
+          { "label": "f", "pts": 2, "question": "<p>Similar matrices have the same eigenvalues.</p>", "answer": "True", "solution": "<p>\\(B=P^{-1}AP\\) gives \\(\\det(B-\\lambda I)=\\det(A-\\lambda I)\\).</p>", "verified": "reasoned" }
+        ]
       }
     ],
     "T2": [
       {
-        "paper": "Example paper B",
-        "q": "1",
-        "pts": 3,
-        "question": "<p>Find \\(A^{-1}\\) for \\(A=\\begin{pmatrix}2&1\\\\5&3\\end{pmatrix}\\).</p>",
-        "solution": "<ol><li>\\(\\det A=2\\cdot3-1\\cdot5=1\\ne0\\).</li><li>\\(A^{-1}=\\begin{pmatrix}3&-1\\\\-5&2\\end{pmatrix}\\).</li><li>Check: \\(\\begin{pmatrix}2&1\\\\5&3\\end{pmatrix}\\begin{pmatrix}3&-1\\\\-5&2\\end{pmatrix}=\\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}\\) ✓</li></ol>"
+        "id": "A-2a",
+        "paper": "Example paper A",
+        "q": "2a",
+        "pts": 4,
+        "parts": [
+          {
+            "label": "",
+            "pts": 4,
+            "question": "<p>Compute \\(\\det\\begin{pmatrix}1&2&0\\\\0&1&3\\\\2&0&1\\end{pmatrix}\\).</p>",
+            "answer": "\\(\\det = 13\\)",
+            "solution": "<ol><li>Expand along row 1 (it has a zero): \\(1\\cdot\\det\\begin{pmatrix}1&3\\\\0&1\\end{pmatrix}-2\\cdot\\det\\begin{pmatrix}0&3\\\\2&1\\end{pmatrix}+0\\).</li><li>\\(=1\\cdot1-2\\cdot(0-6)=1+12=13\\).</li></ol>",
+            "verified": "recomputed",
+            "rubric": { "source": "official", "items": [
+              { "pts": 2, "text": "Expansion along a row or column with the correct signs" },
+              { "pts": 1, "text": "Both 2×2 minors correct" },
+              { "pts": 1, "text": "Final value 13" }
+            ] }
+          }
+        ]
       }
     ],
     "T3": [
       {
+        "id": "B-1",
+        "paper": "Example paper B",
+        "q": "1",
+        "pts": 3,
+        "parts": [
+          {
+            "label": "",
+            "pts": 3,
+            "question": "<p>Find \\(A^{-1}\\) for \\(A=\\begin{pmatrix}2&1\\\\5&3\\end{pmatrix}\\), and verify your answer.</p>",
+            "answer": "\\(A^{-1}=\\begin{pmatrix}3&-1\\\\-5&2\\end{pmatrix}\\)",
+            "solution": "<ol><li>\\(\\det A=2\\cdot3-1\\cdot5=1\\ne0\\), so the inverse exists.</li><li>Swap and negate, divide by 1: \\(\\begin{pmatrix}3&-1\\\\-5&2\\end{pmatrix}\\).</li><li>Check: \\(\\begin{pmatrix}2&1\\\\5&3\\end{pmatrix}\\begin{pmatrix}3&-1\\\\-5&2\\end{pmatrix}=\\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}\\).</li></ol>",
+            "verified": "recomputed",
+            "rubric": { "source": "inferred", "items": [
+              { "pts": 1, "text": "\\(\\det A\\) computed and shown \\(\\ne0\\)" },
+              { "pts": 1, "text": "Correct inverse" },
+              { "pts": 1, "text": "Verification \\(AA^{-1}=I\\) written out" }
+            ] }
+          }
+        ]
+      }
+    ],
+    "T4": [
+      {
+        "id": "A-4",
         "paper": "Example paper A",
         "q": "4",
-        "pts": 6,
-        "question": "<p>Let \\(A=\\begin{pmatrix}2&1\\\\1&2\\end{pmatrix}\\). Find the eigenvalues and decide whether \\(A\\) is positive definite.</p>",
-        "solution": "<ol><li>\\(\\operatorname{tr}A=4\\), \\(\\det A=3\\), so \\(\\lambda^2-4\\lambda+3=0\\).</li><li>\\(\\lambda=1\\) or \\(\\lambda=3\\).</li><li>Both are \\(>0\\), and none is \\(<0\\), so \\(A\\) is <strong>positive definite</strong>.</li></ol><p><em>Rubric (6, inferred):</em> 2 polynomial, 2 eigenvalues, 2 conclusion with reason.</p>"
+        "pts": 9,
+        "intro": "<p>Let \\(A=\\begin{pmatrix}2&1\\\\1&2\\end{pmatrix}\\). The figure shows the unit square and its image under \\(A\\).</p><img src=\"figures/unit-square.svg\" alt=\"The unit square and the parallelogram with corners (0,0), (2,1), (3,3) and (1,2) that A maps it to.\" width=\"300\">",
+        "parts": [
+          {
+            "label": "a",
+            "pts": 2,
+            "question": "<p>Give the characteristic polynomial of \\(A\\).</p>",
+            "answer": "\\(\\lambda^2-4\\lambda+3\\)",
+            "solution": "<p>\\(\\operatorname{tr}A=4\\) and \\(\\det A=3\\), so \\(\\lambda^2-4\\lambda+3\\).</p>",
+            "verified": "recomputed",
+            "rubric": { "source": "inferred", "items": [ { "pts": 1, "text": "Trace and determinant (or \\(\\det(A-\\lambda I)\\) written out)" }, { "pts": 1, "text": "Correct polynomial" } ] }
+          },
+          {
+            "label": "b",
+            "pts": 4,
+            "question": "<p>Find the eigenvalues and an eigenvector for each.</p>",
+            "answer": "\\(\\lambda=1\\): \\(v=(1,-1)\\); \\(\\lambda=3\\): \\(v=(1,1)\\)",
+            "solution": "<ol><li>\\(\\lambda^2-4\\lambda+3=(\\lambda-1)(\\lambda-3)\\), so \\(\\lambda=1,3\\).</li><li>\\(\\lambda=1\\): \\(A-I=\\begin{pmatrix}1&1\\\\1&1\\end{pmatrix}\\), so \\(v=(1,-1)\\). Check: \\(A(1,-1)=(1,-1)\\).</li><li>\\(\\lambda=3\\): \\(A-3I=\\begin{pmatrix}-1&1\\\\1&-1\\end{pmatrix}\\), so \\(v=(1,1)\\). Check: \\(A(1,1)=(3,3)\\).</li></ol>",
+            "verified": "recomputed",
+            "rubric": { "source": "inferred", "items": [ { "pts": 1, "text": "Both eigenvalues" }, { "pts": 1, "text": "Eigenvector for \\(\\lambda=1\\)" }, { "pts": 1, "text": "Eigenvector for \\(\\lambda=3\\)" }, { "pts": 1, "text": "Each eigenvector checked with \\(Av=\\lambda v\\)" } ] }
+          },
+          {
+            "label": "c",
+            "pts": 3,
+            "question": "<p>Is \\(A\\) positive definite? Explain.</p>",
+            "answer": "Yes",
+            "solution": "<p>\\(A\\) is symmetric and both eigenvalues (1 and 3) are positive, so \\(A\\) is positive definite. In the figure, \\(A\\) stretches every direction without flipping it.</p>",
+            "verified": "reasoned",
+            "rubric": { "source": "inferred", "items": [ { "pts": 1, "text": "Mentions that \\(A\\) is symmetric" }, { "pts": 1, "text": "Uses the signs of the eigenvalues" }, { "pts": 1, "text": "Correct conclusion" } ] }
+          }
+        ]
       }
     ]
   }

@@ -1,0 +1,15 @@
+paper,q,pts,task,kind,paperTotal
+Example paper A,1,12,T1 True/False,true-false,100
+Example paper A,2a,4,T2 Determinant,calculation,100
+Example paper A,4,9,T4 Eigenvalues,calculation,100
+Example paper B,1,3,T3 2x2 inverse,calculation,100
+Example paper B,2,24,T1 True/False,true-false,100
+Example paper B,3,3,T2 Determinant,calculation,100
+Example paper C 2021,1,16,T1 True/False,true-false,100
+Example paper C 2021,2,4,T2 Determinant,calculation,100
+Example paper C 2021,3,3,T3 2x2 inverse,calculation,100
+Example paper C 2021,5,6,T4 Eigenvalues,calculation,100
+Example paper D 2023,1,20,T1 True/False,true-false,100
+Example paper D 2023,2,3,T2 Determinant,calculation,100
+Example paper D 2023,4,3,T3 2x2 inverse,calculation,100
+Example paper D 2023,6,8,T4 Eigenvalues,calculation,100
