@@ -11,7 +11,23 @@ It counts which question types come back across the papers, ranks them by points
 
 The look is a single reading column, like a well-typeset course reader in Crimson Pro. Each card reads top to bottom: why it matters, what graders reward, then the questions. The one exception is the recipe: it sits beside the questions and stays on screen while you scroll (on a phone, a floating **Recipe** button brings it up), and a **Hide recipe** switch removes it for closed-book practice. "How this exam is graded" stays folded until you open it, and a sun/moon button switches light and dark mode.
 
-## Install
+## Use it in Claude or ChatGPT (no install)
+
+Start a new chat on claude.ai or chatgpt.com, attach your past exams (and solutions if you have them), and paste:
+
+```
+Use the "exam-stack" skill. Read its instructions and follow them step by step:
+https://raw.githubusercontent.com/OskarRabenda/exam-stack-skill/main/skills/exam-stack/SKILL.md
+
+My course: [course name]
+Exam date and time: [date, time]
+Study time I have: [about N hours]
+My past exams are attached.
+```
+
+Answer its questions, then open the page it gives you.
+
+## Install (Claude Code and other coding agents)
 
 ```bash
 npx skills add OskarRabenda/exam-stack-skill

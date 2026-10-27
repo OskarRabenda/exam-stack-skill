@@ -5,6 +5,18 @@ description: Turn a large pool of past written exams into a prioritized, interac
 
 # Exam stack
 
+> **Use it without installing anything (Claude or ChatGPT website).** Start a new chat, attach your past exams (and solutions if you have them), and paste this:
+>
+> ```
+> Use the "exam-stack" skill. Read its instructions and follow them step by step:
+> https://raw.githubusercontent.com/OskarRabenda/exam-stack-skill/main/skills/exam-stack/SKILL.md
+>
+> My course: [course name]
+> Exam date and time: [date, time]
+> Study time I have: [about N hours]
+> My past exams are attached.
+> ```
+
 An exam stack is one HTML page that answers a student's question: *with the time I have left, what should I practise, in what order, with which real exam questions, and how will it be graded?*
 
 It shows how the exam is graded, then a ranked list of **task cards**. A task is one recurring *kind* of question ("compute an inverse with the extended Euclidean algorithm", "True/False on definitions", "explain why TCP needs a three-way handshake"). Each card holds:
@@ -22,6 +34,22 @@ The value is in two things a student can't easily do alone: **an honest ranking*
 
 - **Written exams only**, with a **large pool of past papers** (as a rule of thumb, at least 4; more is better). The ranking is a count, and a count over two papers isn't one.
 - Not for oral exams, lab or practical exams, take-home projects, or courses with no past papers. If that's the situation, say so and stop rather than building something that looks authoritative but isn't.
+
+## Running from a link (Claude or ChatGPT in the browser, nothing installed)
+
+If you were pointed at this file by URL instead of having the skill installed, everything still works:
+- **The other files** live next to this one. Open them by adding the path to `https://raw.githubusercontent.com/OskarRabenda/exam-stack-skill/main/skills/exam-stack/`, e.g. `…/references/stack-json.md` or `…/assets/template.html`. Read a reference when a phase tells you to.
+- **Inputs** are the files attached to the chat instead of a folder. **Outputs** are files you hand back (a download, or an Artifact / canvas) instead of files saved to a folder.
+- **Counting (phase 3):** run `scripts/tally.mjs` if you can run Node with internet access. Otherwise do the same count in Python or by hand: papers on, typical points, share of all points with every paper normalized to 100, year last seen.
+- **Building (phase 6):** if you can run Node, fetch `scripts/build.mjs` and `assets/template.html` and run the build. If not, build it yourself:
+  1. Fetch `assets/template.html`.
+  2. Inside every `\( … \)` and `\[ … \]` in your data, replace `<` with `&lt;`.
+  3. Serialize `stack.json` and replace `</` with `<\/`.
+  4. Put the result in place of `/*__STACK__*/` in the template.
+  5. Check yourself what the build would check: unique ids, every part has a question and an answer under it, and no True/False block bundled into one part.
+
+  Images can't be inlined this way, so describe a figure in words or skip that exercise.
+- **Delivering:** in Claude, publish the finished page as an HTML Artifact. In ChatGPT, give it as a downloadable `exam-stack.html`. The page loads its fonts and MathJax from the web, and keeps progress in the student's browser.
 
 ## Phases
 
